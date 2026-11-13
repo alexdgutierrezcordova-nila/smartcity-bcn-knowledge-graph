@@ -18,7 +18,7 @@
     rdfs:label "Vocabulario de Movilidad y Calidad del Aire de Barcelona"@es ;
     rdfs:comment "Modelo ontológico para la integración semántica de sistemas de bicicletas compartidas (Bicing) y modelos de dispersión atmosférica CAMS (Open-Meteo) en Barcelona."@es ;
     owl:versionInfo "1.0.0" ;
-    dcterms:creator "Alex Gutiérrez, David Emanuel Toa"@es .
+    dcterms:creator "Alex Gutiérrez, David Manotoa"@es .
 
 # ==============================================================================
 # CLASES (CONCEPTOS)

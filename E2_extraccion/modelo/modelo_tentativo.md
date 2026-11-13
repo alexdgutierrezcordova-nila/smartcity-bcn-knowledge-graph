@@ -2,7 +2,7 @@
 
 **Proyecto:** Grafo de Conocimiento para Smart City Barcelona — Movilidad Sostenible (CityBikes Bicing) y Calidad del Aire (Open-Meteo CAMS)  
 **Asignatura:** Interoperabilidad y Explotación de Datos en Ecosistemas Heterogéneos  
-**Autores:** Alex Gutiérrez, David Emanuel Toa  
+**Autores:** Alex Gutiérrez, David Manotoa  
 **Fecha:** Noviembre 2026  
 
 ---

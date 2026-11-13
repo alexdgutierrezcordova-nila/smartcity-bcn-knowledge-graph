@@ -4,7 +4,7 @@
 * **Institución:** Universidad Técnica Particular de Loja (UTPL)
 * **Asignatura:** Interoperabilidad y Explotación de Datos en Ecosistemas Heterogéneos
 * **Docente:** Janneth Alexandra Chicaiza Espinosa
-* **Integrantes del Grupo:** Alex Gutiérrez, David Emanuel Toa
+* **Integrantes del Grupo:** Alex Gutiérrez, David Manotoa
 * **Dominio:** Ciudades Inteligentes (Smart Cities) — Barcelona, España
 * **Subdominios Integrados:** Movilidad Urbana Sostenible (Bicing / CityBikes) y Medio Ambiente (Calidad del Aire / Open-Meteo CAMS)
 * **Fecha de consolidación:** 12 de noviembre de 2026
@@ -15,7 +15,7 @@
 
 | Código | Defecto Original en el E1 Entregado | Causa Raíz / Evidencia Empírica | Corrección Aplicada en este Documento Base |
 |---|---|---|---|
-| **H-NOM** | Portada consignaba "Davide Manotoa". | Error tipográfico en el nombre del estudiante. | Corregido a **David Emanuel Toa**. |
+| **H-NOM** | Portada consignaba "Davide Manotoa". | Error tipográfico en el nombre del estudiante. | Corregido a **David Manotoa**. |
 | **H-IA** | Declaración de IA mencionaba accidentes en Madrid, Overpass API y farolas (`street_lamp`). | Texto residual no auditado proveniente de borradores previos. | Reescrita al 100% reflejando exclusivamente el procesamiento real de Barcelona (Bicing + Open-Meteo). |
 | **H1** | El registro citado en texto (§5.2) decía `05:19:23`, `free=1`, `empty=9`, pero la captura de la Fig. 1 mostraba `16:55:24`, `free=4`, `empty=3`. | Desconexión entre muestras redactadas y la evidencia visual. | Sustituido por registros reales extraídos directamente de las llamadas a la API oficial con hash y timestamp auditables. |
 | **H2** | El informe afirmaba que el `timestamp` era la marca de tiempo de reporte de la estación. | Análisis de dispersión: 542 estaciones reportan marcas dentro del mismo segundo (`16:30:24.89...`). | Redefinido como **marca temporal de captura/ingesta** del servicio CityBikes. |

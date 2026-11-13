@@ -3,7 +3,7 @@
 > **Universidad Técnica Particular de Loja (UTPL)**  
 > **Asignatura:** Interoperabilidad y Explotación de Datos en Ecosistemas Heterogéneos  
 > **Docente:** Dra. Janneth Alexandra Chicaiza Espinosa  
-> **Autores:** Alex Gutiérrez, David Emanuel Toa  
+> **Autores:** Alex Gutiérrez, David Manotoa  
 > **Periodo:** Noviembre 2026  
 
 ---
