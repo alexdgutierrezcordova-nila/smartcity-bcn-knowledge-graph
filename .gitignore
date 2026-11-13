@@ -1,0 +1,54 @@
+# ==============================================================================
+# .gitignore para Proyecto General: Smart City Barcelona Knowledge Graph
+# ==============================================================================
+
+# Entornos virtuales Python (CRÍTICO: nunca subir a GitHub)
+.venv/
+*/.venv/
+env/
+venv/
+ENV/
+
+# Caches de Python y compilación
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*/.egg-info/
+dist/
+build/
+
+# Pruebas y cobertura
+.pytest_cache/
+*/.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+.ipython/
+*/.ipython/
+
+# Archivos de sistema operativo y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Archivos temporales de Office (abiertos)
+~$*.docx
+~$*.xlsx
+
+# Backups y logs temporales
+*.log
+*/logs/
+
+# Variables de entorno y credenciales
+.env
+.env.*
+!.env.example
+*.pem
+*.key

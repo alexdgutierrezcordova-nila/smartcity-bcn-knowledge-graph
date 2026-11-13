@@ -1,0 +1,169 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema:  <https://schema.org/> .
+@prefix sosa:    <http://www.w3.org/ns/sosa/> .
+@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix vocab:   <http://example.org/bcn-kg/vocab#> .
+@prefix data:    <http://example.org/bcn-kg/data/> .
+
+# ==============================================================================
+# DEFINICIÓN DE LA ONTOLOGÍA / VOCABULARIO
+# ==============================================================================
+
+<http://example.org/bcn-kg/vocab#>
+    rdf:type owl:Ontology ;
+    rdfs:label "Vocabulario de Movilidad y Calidad del Aire de Barcelona"@es ;
+    rdfs:comment "Modelo ontológico para la integración semántica de sistemas de bicicletas compartidas (Bicing) y modelos de dispersión atmosférica CAMS (Open-Meteo) en Barcelona."@es ;
+    owl:versionInfo "1.0.0" ;
+    dcterms:creator "Alex Gutiérrez, David Emanuel Toa"@es .
+
+# ==============================================================================
+# CLASES (CONCEPTOS)
+# ==============================================================================
+
+vocab:RedBicicletas
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf schema:Service ;
+    rdfs:label "Red de Bicicletas Compartidas"@es ;
+    rdfs:comment "Infraestructura o servicio metropolitano de transporte en bicicleta pública compartida."@es .
+
+vocab:EstacionBicicleta
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf schema:CivicStructure ;
+    rdfs:label "Estación de Bicicletas"@es ;
+    rdfs:comment "Punto físico anclado en vía pública con postes para el bloqueo, préstamo y devolución de bicicletas."@es .
+
+vocab:CeldaModelo
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf schema:Place ;
+    rdfs:label "Celda de Modelo Atmosférico"@es ;
+    rdfs:comment "Unidad espacial discreta (cuadrícula ~11 km) del modelo regional europeo CAMS utilizada por Open-Meteo para estimar la calidad del aire."@es .
+
+vocab:EstadoEstacion
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf sosa:Observation ;
+    rdfs:label "Estado Dinámico de la Estación"@es ;
+    rdfs:comment "Observación temporal atómica del inventario operativo (vehículos disponibles y anclajes libres) en una estación física."@es .
+
+vocab:ObservacionCalidadAire
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf sosa:Observation ;
+    rdfs:label "Observación de Calidad del Aire"@es ;
+    rdfs:comment "Estimación o medición modelada de la concentración superficial de contaminantes atmosféricos en una celda espacial."@es .
+
+vocab:Contaminante
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf sosa:ObservableProperty ;
+    rdfs:label "Contaminante Atmosférico"@es ;
+    rdfs:comment "Sustancia o material particulado evaluado como indicador de la calidad del aire (NO2, PM10, PM2.5)."@es .
+
+# ==============================================================================
+# PROPIEDADES DE OBJETOS (RELACIONES)
+# ==============================================================================
+
+vocab:perteneceARed
+    rdf:type rdf:Property ;
+    rdfs:subPropertyOf dcterms:isPartOf ;
+    rdfs:label "pertenece a la red"@es ;
+    rdfs:comment "Asocia una estación física con el servicio metropolitano de bicicletas al que pertenece."@es ;
+    rdfs:domain vocab:EstacionBicicleta ;
+    rdfs:range vocab:RedBicicletas .
+
+vocab:operadaPor
+    rdf:type rdf:Property ;
+    rdfs:subPropertyOf schema:provider ;
+    rdfs:label "operada por"@es ;
+    rdfs:comment "Relaciona la red de movilidad con las empresas u organismos públicos responsables de su gestión operativa."@es ;
+    rdfs:domain vocab:RedBicicletas ;
+    rdfs:range schema:Organization .
+
+vocab:contenidaEnCelda
+    rdf:type rdf:Property ;
+    rdfs:subPropertyOf schema:containedInPlace ;
+    rdfs:label "contenida en la celda atmosférica"@es ;
+    rdfs:comment "Nodo Puente semántico: vincula una estación física con la celda del modelo de dispersión CAMS que cubre sus coordenadas geográficas."@es ;
+    rdfs:domain vocab:EstacionBicicleta ;
+    rdfs:range vocab:CeldaModelo .
+
+vocab:tieneEstado
+    rdf:type rdf:Property ;
+    rdfs:label "tiene estado"@es ;
+    rdfs:comment "Vincula una estación con una captura temporal de su inventario operativo."@es ;
+    rdfs:domain vocab:EstacionBicicleta ;
+    rdfs:range vocab:EstadoEstacion .
+
+vocab:mideContaminante
+    rdf:type rdf:Property ;
+    rdfs:subPropertyOf sosa:observedProperty ;
+    rdfs:label "mide contaminante"@es ;
+    rdfs:comment "Indica la propiedad química o física cuantificada en la observación ambiental."@es ;
+    rdfs:domain vocab:ObservacionCalidadAire ;
+    rdfs:range vocab:Contaminante .
+
+# ==============================================================================
+# PROPIEDADES DE DATOS (ATRIBUTOS / LITERALES)
+# ==============================================================================
+
+vocab:bicicletasDisponibles
+    rdf:type rdf:Property ;
+    rdfs:label "bicicletas disponibles"@es ;
+    rdfs:comment "Total de vehículos aptos para alquiler inmediato en la estación."@es ;
+    rdfs:domain vocab:EstadoEstacion ;
+    rdfs:range xsd:nonNegativeInteger .
+
+vocab:anclajesLibres
+    rdf:type rdf:Property ;
+    rdfs:label "anclajes libres"@es ;
+    rdfs:comment "Número de ranuras o postes desocupados aptos para recibir la devolución de bicicletas."@es ;
+    rdfs:domain vocab:EstadoEstacion ;
+    rdfs:range xsd:nonNegativeInteger .
+
+vocab:bicicletasMecanicas
+    rdf:type rdf:Property ;
+    rdfs:label "bicicletas mecánicas disponibles"@es ;
+    rdfs:comment "Cantidad de bicicletas de tracción exclusivamente mecánica en la estación."@es ;
+    rdfs:domain vocab:EstadoEstacion ;
+    rdfs:range xsd:nonNegativeInteger .
+
+vocab:bicicletasElectricas
+    rdf:type rdf:Property ;
+    rdfs:label "bicicletas eléctricas disponibles"@es ;
+    rdfs:comment "Cantidad de bicicletas con asistencia al pedaleo eléctrico (ebikes) disponibles en la estación."@es ;
+    rdfs:domain vocab:EstadoEstacion ;
+    rdfs:range xsd:nonNegativeInteger .
+
+vocab:enLinea
+    rdf:type rdf:Property ;
+    rdfs:label "estación en línea"@es ;
+    rdfs:comment "Indicador booleano que confirma si la estación está conectada y operativa en el sistema central."@es ;
+    rdfs:domain vocab:EstadoEstacion ;
+    rdfs:range xsd:boolean .
+
+vocab:distanciaACentroideKm
+    rdf:type rdf:Property ;
+    rdfs:label "distancia al centroide de celda en km"@es ;
+    rdfs:comment "Métrica geodésica continua (Haversine) que cuantifica la distancia entre la estación y el punto central de la celda CAMS."@es ;
+    rdfs:domain vocab:EstacionBicicleta ;
+    rdfs:range xsd:decimal .
+
+# ==============================================================================
+# INSTANCIAS DE REFERENCIA (CONTAMINANTES ESTÁNDAR)
+# ==============================================================================
+
+data:contaminante_NO2
+    rdf:type vocab:Contaminante ;
+    rdfs:label "Dióxido de Nitrógeno (NO2)"@es ;
+    rdfs:comment "Gas reactivo indicador de emisiones del transporte rodado a motor de combustión."@es .
+
+data:contaminante_PM10
+    rdf:type vocab:Contaminante ;
+    rdfs:label "Material Particulado PM10"@es ;
+    rdfs:comment "Partículas sólidas o líquidas suspendidas con diámetro aerodinámico inferior a 10 micrómetros."@es .
+
+data:contaminante_PM2_5
+    rdf:type vocab:Contaminante ;
+    rdfs:label "Partículas Finas Respirables PM2.5"@es ;
+    rdfs:comment "Fracción fina respirable capaz de penetrar profundamente en las vías respiratorias humanas."@es .

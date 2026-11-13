@@ -1,0 +1,9 @@
+entidad,id_recurso,regla,detalle,gravedad
+EstadoEstacion,1b6c8a565030e3415310729ecda3071c@2026-11-12T16:30:24.894821+00:00,Discrepancia suma bicicletas: normal + ebikes != free_bikes,"normal=5, ebikes=3, free=0 (delta=-8)",MEDIA
+EstadoEstacion,305ae67218afaca2bbcb3ff18f48c766@2026-11-12T16:30:24.894479+00:00,Discrepancia suma bicicletas: normal + ebikes != free_bikes,"normal=0, ebikes=4, free=0 (delta=-4)",MEDIA
+EstadoEstacion,3285abf457eb641068daf1b4e5a778de@2026-11-12T16:30:24.895940+00:00,Discrepancia suma bicicletas: normal + ebikes != free_bikes,"normal=15, ebikes=8, free=0 (delta=-23)",MEDIA
+EstadoEstacion,4221670311bebbea4f1f557ffcd04050@2026-11-12T16:30:24.896167+00:00,Discrepancia suma bicicletas: normal + ebikes != free_bikes,"normal=2, ebikes=0, free=0 (delta=-2)",MEDIA
+EstadoEstacion,649da7e42e026afec2f1bae50f912cd1@2026-11-12T16:30:24.895393+00:00,Discrepancia suma bicicletas: normal + ebikes != free_bikes,"normal=0, ebikes=1, free=0 (delta=-1)",MEDIA
+EstadoEstacion,85754ee6b3be59b9e61376c7d72cd0eb@2026-11-12T16:30:24.894616+00:00,Discrepancia suma bicicletas: normal + ebikes != free_bikes,"normal=4, ebikes=17, free=0 (delta=-21)",MEDIA
+EstadoEstacion,aa3c9dc88d9b7e74bdd960c5d2a42055@2026-11-12T16:30:24.895454+00:00,Discrepancia suma bicicletas: normal + ebikes != free_bikes,"normal=4, ebikes=15, free=0 (delta=-19)",MEDIA
+EstadoEstacion,d619601c806c7e3476c79145cafcd1da@2026-11-12T16:30:24.895436+00:00,Discrepancia suma bicicletas: normal + ebikes != free_bikes,"normal=2, ebikes=10, free=0 (delta=-12)",MEDIA
