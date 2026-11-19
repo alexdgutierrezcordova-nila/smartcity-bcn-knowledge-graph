@@ -42,36 +42,90 @@ El presente modelo tentativo ha sido diseñado siguiendo las recomendaciones de 
 
 ---
 
-## 3. Diagrama Conceptual del Grafo
+## 3. Diagrama Conceptual del Grafo (Notación Bipartita UML-RDF / Chowlk)
+
+![Diagrama Conceptual Bipartito del Modelo de Datos Tentativo (TBox UML-RDF)](modelo_datos.png)
+
+### 3.1 Estructura y Denominación Formal de los Componentes del Diagrama
+Siguiendo el estándar metodológico de ingeniería ontológica impartido en cátedra (notación **UML-RDF / Chowlk** para el esquema conceptual **TBox**), el diagrama se estructura en cinco elementos formales:
+
+1. **Nodos de Clase Ontológica Bipartitos (`rdfs:Class` / `owl:Class`):**  
+   Cada entidad conceptual se representa mediante un rectángulo dividido por una **línea horizontal continua** en dos compartimentos:
+   - **Compartimento Superior (Encabezado de Clase — *Class Header*):** Consigna el nombre calificado (**QName / CURIE**) de la clase (`vocab:EstacionBicicleta`, `vocab:RedBicicletas`, `schema:Organization`, `vocab:CeldaModelo`, `vocab:EstadoEstacion`, `vocab:ObservacionCalidadAire`, `vocab:Contaminante`, `schema:QuantitativeValue`) junto con su alineación jerárquica (`rdfs:subClassOf` / `⊑`).
+   - **Compartimento Inferior (Propiedades de Tipo de Dato — *Datatype Properties* / `owl:DatatypeProperty`):** Contiene **exclusivamente atributos literales** (`xsd:string`, `xsd:decimal`, `xsd:nonNegativeInteger`, `xsd:dateTime`, `xsd:boolean`). Por rigor ontológico, dentro de las cajas jamás se incluyen URIs de instancias ni propiedades de objeto.
+2. **Aristas Dirigidas entre Cajas (Propiedades de Objeto — *Object Properties* / `owl:ObjectProperty`):**  
+   Las relaciones semánticas entre dos clases viven **únicamente sobre las flechas** que parten de la clase **Dominio (`rdfs:domain`)** y apuntan hacia la clase **Rango (`rdfs:range`)** (`vocab:perteneceARed`, `vocab:operadaPor`, `vocab:contenidaEnCelda`, `vocab:tieneEstado`, `sosa:hasFeatureOfInterest`, `vocab:mideContaminante`, `sosa:hasResult`).
+3. **Arista Reflexiva en Bucle (*Self-Loop Object Property* — `schema:containedInPlace`):**  
+   Representada por el arco curvo azul sobre `vocab:CeldaModelo (⊑ schema:Place)`, modela una relación jerárquica cuyo dominio y rango es `schema:Place` (cada celda regional CAMS está contenida espacialmente dentro de la unidad territorial mayor de `Barcelona`).
+4. **Código Cromático de Trazabilidad Léxica (`vocab:` en Rojo):**  
+   Todos los términos propios creados en [vocab.ttl](file:///c:/Users/D%20E%20L%20L%20G%2015/Documents/INTEROPERY%20EXPLO%20DATOS%20ECO%20HET/Proyecto%20General/E2_extraccion/modelo/vocab.ttl) (`◆ vocab:*`) se destacan en **color rojo carmín** tanto dentro de los compartimentos de atributos como en los rótulos de las flechas, diferenciándolos visualmente de los términos reutilizados de catálogos estándar (`schema:`, `sosa:`, `geo:`, `dcterms:`).
+5. **Aristas Punteadas de Consulta / Enlace Espacio-Temporal:**  
+   Representan las relaciones inferidas o resueltas mediante consultas integradas SPARQL (**PC11 a PC15**), cruzando `vocab:EstadoEstacion` y `vocab:ObservacionCalidadAire` cuando comparten la misma `vocab:CeldaModelo` y una ventana horaria UTC $|\Delta t| \le 30\text{ min}$.
 
 ```mermaid
-flowchart TD
-    subgraph Dominio_Movilidad["Dominio 1: Movilidad Urbana (CityBikes)"]
-        ORG["schema:Organization<br/>(BSM / CESPA / PBSC)"]
-        RED["vocab:RedBicicletas<br/>⊑ schema:Service"]
-        EST["vocab:EstacionBicicleta<br/>⊑ schema:CivicStructure"]
-        ESTADO["vocab:EstadoEstacion<br/>⊑ sosa:Observation"]
-    end
+classDiagram
+    class RedBicicletas["vocab:RedBicicletas (⊑ schema:Service)"] {
+        schema:identifier
+        schema:name
+        dcterms:spatial
+        schema:url
+    }
+    class Organization["schema:Organization (⊑ dcterms:Agent)"] {
+        schema:identifier
+        schema:name
+        schema:address
+    }
+    class EstacionBicicleta["vocab:EstacionBicicleta (⊑ schema:CivicStructure)"] {
+        schema:identifier
+        schema:name
+        geo:lat
+        geo:long
+        schema:address
+        vocab:distanciaACentroideKm
+    }
+    class CeldaModelo["vocab:CeldaModelo (⊑ schema:Place)"] {
+        schema:identifier
+        schema:name
+        geo:lat
+        geo:long
+        schema:elevation
+        dcterms:source
+    }
+    class EstadoEstacion["vocab:EstadoEstacion (⊑ sosa:Observation)"] {
+        sosa:resultTime
+        vocab:bicicletasDisponibles
+        vocab:anclajesLibres
+        vocab:bicicletasMecanicas
+        vocab:bicicletasElectricas
+        vocab:enLinea
+    }
+    class ObservacionCalidadAire["vocab:ObservacionCalidadAire (⊑ sosa:Observation)"] {
+        dcterms:identifier
+        sosa:resultTime
+        sosa:hasSimpleResult
+        dcterms:issued
+    }
+    class Contaminante["vocab:Contaminante (⊑ sosa:ObservableProperty)"] {
+        dcterms:identifier
+        rdfs:label
+        schema:name
+        rdfs:comment
+    }
+    class QuantitativeValue["schema:QuantitativeValue"] {
+        schema:value
+        schema:unitText
+        schema:unitCode
+        schema:minValue
+    }
 
-    subgraph Nodo_Puente["Nodo Puente (Integración Espacial)"]
-        CEL["vocab:CeldaModelo<br/>⊑ schema:Place (CAMS ~11 km)"]
-    end
-
-    subgraph Dominio_Ambiental["Dominio 2: Medio Ambiente (Open-Meteo)"]
-        OBS["vocab:ObservacionCalidadAire<br/>⊑ sosa:Observation"]
-        CONT["vocab:Contaminante<br/>⊑ sosa:ObservableProperty"]
-        VAL["schema:QuantitativeValue"]
-    end
-
-    RED -->|"vocab:operadaPor (schema:provider)"| ORG
-    EST -->|"vocab:perteneceARed (dcterms:isPartOf)"| RED
-    EST -->|"vocab:tieneEstado"| ESTADO
-    
-    EST -->|"vocab:contenidaEnCelda (schema:containedInPlace)"| CEL
-    OBS -->|"sosa:hasFeatureOfInterest"| CEL
-    
-    OBS -->|"vocab:mideContaminante (sosa:observedProperty)"| CONT
-    OBS -->|"sosa:hasResult"| VAL
+    EstacionBicicleta --> RedBicicletas : vocab:perteneceARed (⊑ dcterms:isPartOf)
+    RedBicicletas --> Organization : vocab:operadaPor (⊑ schema:provider)
+    EstacionBicicleta --> CeldaModelo : vocab:contenidaEnCelda (⊑ schema:containedInPlace)
+    EstacionBicicleta --> EstadoEstacion : vocab:tieneEstado (⊑ sosa:hasObservation)
+    ObservacionCalidadAire --> CeldaModelo : sosa:hasFeatureOfInterest
+    ObservacionCalidadAire --> Contaminante : vocab:mideContaminante (⊑ sosa:observedProperty)
+    ObservacionCalidadAire --> QuantitativeValue : sosa:hasResult
+    CeldaModelo --> CeldaModelo : schema:containedInPlace (Celda ⊂ Barcelona)
 ```
 
 ---

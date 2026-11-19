@@ -217,6 +217,27 @@ def crear_notebook():
                 "print(f'Propiedades definidas ({len(props)}): {props}')"
             ]
         },
+        # Celda 11b: Diagrama visual del modelo de datos tentativo
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "### Diagrama Conceptual del Modelo de Datos Tentativo\n",
+                "A continuación se genera y visualiza el esquema arquitectónico completo del Grafo de Conocimiento, diferenciando por color el vocabulario de cada clase (`sosa:`, `schema:`, `geo:`, `dcterms:`), señalando con `◆` los términos propios (`vocab:`) y con líneas punteadas las relaciones obtenidas por consulta y enlace espacio-temporal."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# Representación gráfica del Modelo de Datos Tentativo (RDF / OWL / SOSA)\n",
+                "from bcn_kg.diagrama import dibujar_modelo\n",
+                "\n",
+                "dibujar_modelo(DIR_BASE / 'modelo' / 'modelo_datos.png')"
+            ]
+        },
         # Celda 12: Markdown Mapeo Campos
         {
             "cell_type": "markdown",
