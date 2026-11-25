@@ -72,6 +72,45 @@ powershell -ExecutionPolicy Bypass -File .\run_final.ps1
 
 ---
 
+## 🧩 Entregable 3: Generación de datos RDF (`E3_rdf/`)
+
+```text
+E3_rdf/
+├── scripts/
+│   ├── preprocesar.py        # Corrige la asignación de celdas CAMS (rejilla 0.1°)
+│   ├── generar_rdf.py        # CSV -> RDF (Turtle) + validación contra vocab.ttl
+│   ├── cargar_graphdb.py     # Crea el repositorio bcn-kg en GraphDB, importa y verifica
+│   ├── generar_notebook.py   # Construye, ejecuta y exporta el notebook a HTML
+│   └── generar_informe.py    # Gráfico de nodos por clase + informe .docx
+├── data/                     # Celdas, observaciones y enlace CAMS corregidos (CSV)
+├── rdf/                      # bicing.ttl, calidad_aire.ttl, estadisticas.md
+├── sparql/                   # Consultas para verificar la carga en GraphDB
+├── graphdb/                  # Resultados de las consultas ejecutadas en GraphDB
+├── notebooks/                # E3_generacion_rdf.ipynb / .html
+├── informe/                  # Informe_proyecto.md / .docx y capturas/
+└── tests/                    # pytest del preprocesamiento y la generación RDF
+```
+
+Desde la raíz del repositorio:
+
+```bash
+uv run --no-project --with rdflib --with pandas --with pytest python -m pytest E3_rdf/tests
+uv run --no-project --with rdflib --with pandas python E3_rdf/scripts/preprocesar.py
+uv run --no-project --with rdflib --with pandas python E3_rdf/scripts/generar_rdf.py
+uv run --no-project --with rdflib --with pandas --with matplotlib --with nbformat --with nbclient --with nbconvert --with ipykernel python E3_rdf/scripts/generar_notebook.py
+```
+
+Almacenamiento en GraphDB (repositorio `bcn-kg`, un grafo con nombre por archivo):
+
+```bash
+docker run -d --name graphdb-bcn -p 7200:7200 ontotext/graphdb:10.8.5
+uv run --no-project python E3_rdf/scripts/cargar_graphdb.py
+```
+
+Workbench en http://localhost:7200. Informe final: `E3_rdf/informe/Informe_proyecto.docx`.
+
+---
+
 ## 📄 Licencia y Atribución
 * Datos de Movilidad: **Open Database License (ODbL)** / **CC BY 4.0** (CityBikes / Bicing BSM).
 * Datos de Calidad del Aire: **CC BY 4.0** (Open-Meteo / Copernicus CAMS).
