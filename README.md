@@ -72,31 +72,42 @@ powershell -ExecutionPolicy Bypass -File .\run_final.ps1
 
 ---
 
-## 🧩 Entregable 3: Generación de datos RDF (`E3_rdf/`)
+## 🧩 Entregable 3: Modelo v2, datos RDF y GraphDB (`E3_rdf/`)
+
+> **Para leer primero:** `E3_rdf/informe/informe_proyecto.html` (informe sin código: fuentes, limpieza,
+> preguntas de competencia, modelo, RDF, GraphDB y respuestas). El código y sus salidas están en
+> `E3_rdf/notebooks/E3_generacion_rdf.html`.
+
+`E3_rdf/modelo/` es el **modelo vigente (v2)**. Simplifica el modelo tentativo de `E2_extraccion/modelo/`, que se
+conserva como historial.
 
 ```text
 E3_rdf/
+├── modelo/                   # Modelo v2: vocab.ttl, modelo_datos.png/.svg,
+│                             # vocabularios_reutilizados.csv, mapeo_campos.csv
 ├── scripts/
 │   ├── preprocesar.py        # Corrige la asignación de celdas CAMS (rejilla 0.1°)
 │   ├── generar_rdf.py        # CSV -> RDF (Turtle) + validación contra vocab.ttl
-│   ├── cargar_graphdb.py     # Crea el repositorio bcn-kg en GraphDB, importa y verifica
-│   ├── generar_notebook.py   # Construye, ejecuta y exporta el notebook a HTML
-│   └── generar_informe.py    # Gráfico de nodos por clase + informe .docx
+│   ├── generar_diagrama.py   # Dibuja el diagrama del modelo
+│   ├── cargar_graphdb.py     # Crea el repositorio bcn-kg en GraphDB, importa y ejecuta las consultas
+│   ├── generar_notebook.py   # Construye, ejecuta y exporta el notebook técnico a HTML
+│   └── generar_informe_html.py # Informe sin código (HTML + Word)
 ├── data/                     # Celdas, observaciones y enlace CAMS corregidos (CSV)
 ├── rdf/                      # bicing.ttl, calidad_aire.ttl, estadisticas.md
-├── sparql/                   # Consultas para verificar la carga en GraphDB
+├── sparql/                   # pc01–pc15.rq (preguntas de competencia) y consultas de verificación
 ├── graphdb/                  # Resultados de las consultas ejecutadas en GraphDB
-├── notebooks/                # E3_generacion_rdf.ipynb / .html
-├── informe/                  # Informe_proyecto.md / .docx y capturas/
-└── tests/                    # pytest del preprocesamiento y la generación RDF
+├── notebooks/                # E3_generacion_rdf.ipynb / .html (anexo técnico)
+├── informe/                  # informe_proyecto.html, Informe_proyecto.docx y capturas/
+└── tests/                    # pytest: preprocesamiento, RDF y las 15 preguntas
 ```
 
 Desde la raíz del repositorio:
 
 ```bash
 uv run --no-project --with rdflib --with pandas --with pytest python -m pytest E3_rdf/tests
-uv run --no-project --with rdflib --with pandas python E3_rdf/scripts/preprocesar.py
 uv run --no-project --with rdflib --with pandas python E3_rdf/scripts/generar_rdf.py
+uv run --no-project --with matplotlib python E3_rdf/scripts/generar_diagrama.py
+uv run --no-project --with rdflib --with pandas --with matplotlib --with python-docx python E3_rdf/scripts/generar_informe_html.py
 uv run --no-project --with rdflib --with pandas --with matplotlib --with nbformat --with nbclient --with nbconvert --with ipykernel python E3_rdf/scripts/generar_notebook.py
 ```
 
@@ -107,7 +118,7 @@ docker run -d --name graphdb-bcn -p 7200:7200 ontotext/graphdb:10.8.5
 uv run --no-project python E3_rdf/scripts/cargar_graphdb.py
 ```
 
-Workbench en http://localhost:7200. Informe final: `E3_rdf/informe/Informe_proyecto.docx`.
+Workbench en http://localhost:7200. Guía para la demostración: `E3_rdf/GUIA_GRAPHDB.md`.
 
 ---
 

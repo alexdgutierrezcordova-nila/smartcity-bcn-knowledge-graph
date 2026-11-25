@@ -41,7 +41,8 @@ CELDAS = [
 ## 1. Objetivo y flujo de trabajo
 
 Convertir los datos extraídos y limpiados en el Entregable 2 a **RDF (Turtle)**, siguiendo el modelo
-validado (`E2_extraccion/modelo/vocab.ttl` y `modelo_datos.png`), para luego almacenarlos en **GraphDB**.
+v2 (`E3_rdf/modelo/vocab.ttl` y `modelo_datos.png`), almacenarlos en **GraphDB** y responder las
+15 preguntas de competencia con SPARQL. El informe sin código está en `E3_rdf/informe/informe_proyecto.html`.
 
 | Paso | Qué se hace | Código |
 |---|---|---|
@@ -55,6 +56,7 @@ validado (`E2_extraccion/modelo/vocab.ttl` y `modelo_datos.png`), para luego alm
 | 8 | Serialización y totales por clase | `serialize`, SPARQL |
 | 9 | Consulta integrada entre fuentes | SPARQL |
 | 10 | Almacenamiento en GraphDB | `cargar_graphdb.py` (API REST) |
+| 11 | Preguntas de competencia PC1–PC15 | `sparql/pcNN.rq` |
 
 Toda la lógica está en `E3_rdf/scripts/` (funciones documentadas y probadas con `pytest`);
 el notebook la ejecuta paso a paso y muestra el resultado de cada bloque.
@@ -96,7 +98,14 @@ definen manualmente con `Namespace`, igual que `data:` y `vocab:`.
     code("""
 pd.DataFrame([(p, str(ns)) for p, ns in gen.PREFIJOS.items()], columns=['Prefijo', 'Namespace'])
 """),
-    md("Clases y propiedades propias definidas en `vocab.ttl` (el modelo validado en el Entregable 2):"),
+    md("""
+Modelo v2: simplifica el modelo tentativo del Entregable 2 (sin `vocab:tieneEstado` ni `schema:QuantitativeValue`;
+ambas observaciones apuntan a un `sosa:FeatureOfInterest`). Clases y propiedades propias definidas en `vocab.ttl`:
+"""),
+    code("""
+from IPython.display import Image
+Image(filename=str(DIR_E3 / 'modelo' / 'modelo_datos.png'), width=1000)
+"""),
     code("""
 vocab = rdflib.Graph().parse(gen.RUTA_VOCAB)
 RDF, RDFS = rdflib.RDF, rdflib.RDFS
@@ -185,9 +194,8 @@ La misma función se usa en las dos fuentes, por eso el nodo común se genera id
 | `vocab:EstacionBicicleta` | `data:estacion_<id>` | `data:estacion_00028670…` |
 | `vocab:EstadoEstacion` | `data:estado_<id>_<fecha>` | `data:estado_00028670…_20261112T163024` |
 | `vocab:CeldaModelo` | `data:celda_<lat>_<lon>` | `data:celda_41.35_2.15` |
-| `vocab:Contaminante` | `data:contaminante_<código>` | `data:contaminante_NO2` (igual que en `vocab.ttl`) |
+| `vocab:Contaminante` | `data:contaminante_<código>` | `data:contaminante_NO2` |
 | `vocab:ObservacionCalidadAire` | `data:obs_<celda>_<hora>_<código>` | `data:obs_celda_41.35_2.15_20261111T000000_NO2` |
-| `schema:QuantitativeValue` | `data:resultado_<…>` | `data:resultado_celda_41.35_2.15_…` |
 | `schema:Place` | `data:Barcelona` | `data:Barcelona` |
 
 Para las estaciones se usa el `id` de CityBikes y no el nombre, porque los nombres de calle se repiten
@@ -213,7 +221,7 @@ muestra = gen.nuevo_grafo()
 estacion = next(g_b2.subjects(rdflib.RDF.type, gen.VOCAB.EstacionBicicleta))
 for t in g_b2.triples((estacion, None, None)):
     muestra.add(t)
-estado = g_b2.value(estacion, gen.VOCAB.tieneEstado)
+estado = g_b2.value(predicate=gen.SOSA.hasFeatureOfInterest, object=estacion)
 for t in g_b2.triples((estado, None, None)):
     muestra.add(t)
 print(muestra.serialize(format='turtle'))
@@ -236,8 +244,8 @@ print('Tripletas generadas (Bicing):', len(g_bicing))
 
 `generar_calidad_aire` crea Barcelona (`schema:Place`), las celdas (contenidas en Barcelona con
 `schema:containedInPlace`), los contaminantes y una observación SOSA por celda, hora y contaminante.
-Cada observación guarda su valor como `sosa:hasSimpleResult` y como `schema:QuantitativeValue` con su unidad
-(`μg/m³`, código UN/CEFACT `GQ`), tal como indica el modelo.
+Cada observación guarda su valor con `sosa:hasSimpleResult`; la unidad (`μg/m³`, código UN/CEFACT `GQ`)
+se declara una sola vez en el contaminante. Barcelona, Bicing y los contaminantes se enlazan con DBpedia.
 """),
     code("ver_codigo(gen.generar_calidad_aire)"),
     code("""
@@ -247,7 +255,7 @@ obs = next(g_aire.subjects(rdflib.RDF.type, gen.VOCAB.ObservacionCalidadAire))
 muestra = gen.nuevo_grafo()
 for t in g_aire.triples((obs, None, None)):
     muestra.add(t)
-for t in g_aire.triples((g_aire.value(obs, gen.SOSA.hasResult), None, None)):
+for t in g_aire.triples((g_aire.value(obs, gen.VOCAB.mideContaminante), None, None)):
     muestra.add(t)
 print(muestra.serialize(format='turtle'))
 """),
@@ -329,7 +337,7 @@ GraphDB 10.8.5 se ejecuta en Docker (`docker run -d --name graphdb-bcn -p 7200:7
 El script `cargar_graphdb.py` usa la API REST de GraphDB para:
 1. crear el repositorio `bcn-kg` (ruleset RDFS-Plus Optimized);
 2. importar cada archivo en su grafo con nombre: `graph/vocab`, `graph/bicing` y `graph/calidad_aire`;
-3. ejecutar las consultas `sparql/01–03` y guardar sus resultados en `E3_rdf/graphdb/`.
+3. ejecutar las consultas `sparql/01–03` y `sparql/pc01–pc15` y guardar sus resultados en `E3_rdf/graphdb/`.
 """),
     code("ver_codigo(cargar_graphdb.importar)"),
     md("""
@@ -352,12 +360,39 @@ comparacion
 Las capturas de GraphDB (grafos importados, totales por clase, jerarquía de clases y visual graph) están en
 `E3_rdf/informe/capturas/` y se incluyen en el informe.
 
-## 14. Conclusiones
+## 14. Preguntas de competencia (PC1–PC15)
+
+Cada pregunta tiene su consulta en `sparql/pcNN.rq`. Se ejecutan sobre el grafo local y se compara el número de
+filas con lo que devolvió GraphDB. Las integradas usan la hora CAMS más cercana a la captura de Bicing (H = 17:00 UTC).
+"""),
+    code("""
+filas = []
+for ruta in sorted((DIR_E3 / 'sparql').glob('pc*.rq')):
+    n_local = len(list((total + vocab).query(ruta.read_text(encoding='utf-8'))))
+    n_gdb = len(json.loads((dir_gdb / f'{ruta.stem}.json').read_text(encoding='utf-8')))
+    filas.append((ruta.stem.upper(), ruta.read_text(encoding='utf-8').splitlines()[0].split('· ', 1)[-1], n_local, n_gdb))
+pcs = pd.DataFrame(filas, columns=['PC', 'Pregunta', 'Filas (rdflib)', 'Filas (GraphDB)'])
+pcs['Coincide'] = pcs['Filas (rdflib)'] == pcs['Filas (GraphDB)']
+pd.set_option('display.max_colwidth', 120)
+pcs
+"""),
+    md("""
+Ejemplo de pregunta integrada (PC11): estaciones con 5 o más bicicletas en celdas con NO₂ ≤ 25 µg/m³ a la hora H.
+"""),
+    code("""
+print((DIR_E3 / 'sparql' / 'pc11.rq').read_text(encoding='utf-8'))
+res = (total + vocab).query((DIR_E3 / 'sparql' / 'pc11.rq').read_text(encoding='utf-8'))
+pd.DataFrame([(str(r.nombre), int(r.bicicletas), str(r.celda), float(r.no2)) for r in res],
+             columns=['Estación', 'Bicicletas', 'Celda', 'NO2 (µg/m³)']).head(10)
+"""),
+    md("""
+## 15. Conclusiones
 
 - Se generaron dos archivos RDF (uno por fuente) bajo una única URI base, enlazados por las celdas CAMS.
 - Los datos se validan automáticamente contra el dominio y rango declarados en `vocab.ttl`: 0 errores.
 - El preprocesamiento detectó y corrigió una fusión incorrecta de celdas CAMS del Entregable 2, recuperando
   2 series de contaminantes que se habían perdido.
+- Las 15 preguntas de competencia se responden con SPARQL y GraphDB devuelve los mismos resultados.
 - La prueba con 2 filas, la validación y los tests (`pytest E3_rdf/tests`) permiten regenerar los datos de forma
   reproducible con `python E3_rdf/scripts/generar_rdf.py`.
 """),
