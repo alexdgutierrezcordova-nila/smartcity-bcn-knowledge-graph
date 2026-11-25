@@ -1,0 +1,150 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema:  <https://schema.org/> .
+@prefix sosa:    <http://www.w3.org/ns/sosa/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix vocab:   <http://example.org/bcn-kg/vocab#> .
+
+# ==============================================================================
+# Vocabulario del proyecto (modelo v2)
+#
+# Idea central: todo dato medido es una sosa:Observation sobre un "feature of
+# interest". Los estados observan una ESTACIÓN; las mediciones de aire observan
+# una CELDA CAMS. La celda es el nodo puente: Estación --contenidaEnCelda--> Celda.
+#
+# Solo se crean términos propios (vocab:) cuando no existe uno adecuado en
+# schema.org, SOSA, WGS84 o Dublin Core. La justificación de cada elección está
+# en vocabularios_reutilizados.csv.
+# ==============================================================================
+
+<http://example.org/bcn-kg/vocab#>
+    rdf:type owl:Ontology ;
+    rdfs:label "Vocabulario de movilidad y calidad del aire de Barcelona"@es ;
+    rdfs:comment "Modelo para integrar la red Bicing (CityBikes) con las estimaciones de calidad del aire CAMS (Open-Meteo)."@es ;
+    owl:versionInfo "2.0.0" ;
+    rdfs:comment "Versión 2: simplifica la versión 1 del Entregable 2 (E2_extraccion/modelo/vocab.ttl)."@es ;
+    dcterms:creator "Alex Gutiérrez, David Manotoa" .
+
+# ------------------------------------------------------------------------------
+# Clases
+# ------------------------------------------------------------------------------
+
+vocab:RedBicicletas
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf schema:Service ;
+    rdfs:label "Red de bicicletas compartidas"@es ;
+    rdfs:comment "Servicio público de bicicletas compartidas de una ciudad (p. ej., Bicing)."@es .
+
+vocab:EstacionBicicleta
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf schema:CivicStructure , sosa:FeatureOfInterest ;
+    rdfs:label "Estación de bicicletas"@es ;
+    rdfs:comment "Punto fijo de la vía pública donde se retiran y devuelven bicicletas. Es lo que observa cada EstadoEstacion."@es .
+
+vocab:CeldaModelo
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf schema:Place , sosa:FeatureOfInterest ;
+    rdfs:label "Celda del modelo CAMS"@es ;
+    rdfs:comment "Cuadrícula de 0.1° x 0.1° del modelo europeo CAMS. Es lo que observa cada ObservacionCalidadAire y el nodo puente con las estaciones."@es .
+
+vocab:EstadoEstacion
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf sosa:Observation ;
+    rdfs:label "Estado de la estación"@es ;
+    rdfs:comment "Lectura del inventario de una estación (bicicletas y anclajes) en un instante."@es .
+
+vocab:ObservacionCalidadAire
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf sosa:Observation ;
+    rdfs:label "Observación de calidad del aire"@es ;
+    rdfs:comment "Concentración horaria estimada de un contaminante en una celda CAMS."@es .
+
+vocab:Contaminante
+    rdf:type rdfs:Class ;
+    rdfs:subClassOf sosa:ObservableProperty ;
+    rdfs:label "Contaminante atmosférico"@es ;
+    rdfs:comment "Propiedad que se mide en una observación de calidad del aire (NO2, PM10, PM2.5)."@es .
+
+# ------------------------------------------------------------------------------
+# Relaciones entre recursos
+# ------------------------------------------------------------------------------
+
+vocab:perteneceARed
+    rdf:type rdf:Property ;
+    rdfs:subPropertyOf dcterms:isPartOf ;
+    rdfs:label "pertenece a la red"@es ;
+    rdfs:comment "Une una estación con la red de bicicletas de la que forma parte."@es ;
+    rdfs:domain vocab:EstacionBicicleta ;
+    rdfs:range vocab:RedBicicletas .
+
+vocab:operadaPor
+    rdf:type rdf:Property ;
+    rdfs:subPropertyOf schema:provider ;
+    rdfs:label "operada por"@es ;
+    rdfs:comment "Une la red con la organización que la gestiona."@es ;
+    rdfs:domain vocab:RedBicicletas ;
+    rdfs:range schema:Organization .
+
+vocab:contenidaEnCelda
+    rdf:type rdf:Property ;
+    rdfs:subPropertyOf schema:containedInPlace ;
+    rdfs:label "contenida en la celda"@es ;
+    rdfs:comment "Nodo puente: une una estación con la celda CAMS cuyos límites contienen sus coordenadas."@es ;
+    rdfs:domain vocab:EstacionBicicleta ;
+    rdfs:range vocab:CeldaModelo .
+
+vocab:mideContaminante
+    rdf:type rdf:Property ;
+    rdfs:subPropertyOf sosa:observedProperty ;
+    rdfs:label "mide el contaminante"@es ;
+    rdfs:comment "Indica qué contaminante cuantifica una observación de calidad del aire."@es ;
+    rdfs:domain vocab:ObservacionCalidadAire ;
+    rdfs:range vocab:Contaminante .
+
+# ------------------------------------------------------------------------------
+# Atributos (valores literales)
+# ------------------------------------------------------------------------------
+
+vocab:bicicletasDisponibles
+    rdf:type rdf:Property ;
+    rdfs:label "bicicletas disponibles"@es ;
+    rdfs:comment "Bicicletas listas para retirar (mecánicas + eléctricas)."@es ;
+    rdfs:domain vocab:EstadoEstacion ;
+    rdfs:range xsd:nonNegativeInteger .
+
+vocab:anclajesLibres
+    rdf:type rdf:Property ;
+    rdfs:label "anclajes libres"@es ;
+    rdfs:comment "Anclajes vacíos donde se puede devolver una bicicleta."@es ;
+    rdfs:domain vocab:EstadoEstacion ;
+    rdfs:range xsd:nonNegativeInteger .
+
+vocab:bicicletasMecanicas
+    rdf:type rdf:Property ;
+    rdfs:label "bicicletas mecánicas"@es ;
+    rdfs:comment "Bicicletas sin asistencia eléctrica disponibles."@es ;
+    rdfs:domain vocab:EstadoEstacion ;
+    rdfs:range xsd:nonNegativeInteger .
+
+vocab:bicicletasElectricas
+    rdf:type rdf:Property ;
+    rdfs:label "bicicletas eléctricas"@es ;
+    rdfs:comment "Bicicletas con asistencia eléctrica (ebikes) disponibles."@es ;
+    rdfs:domain vocab:EstadoEstacion ;
+    rdfs:range xsd:nonNegativeInteger .
+
+vocab:enLinea
+    rdf:type rdf:Property ;
+    rdfs:label "en línea"@es ;
+    rdfs:comment "Indica si la estación está conectada al sistema central."@es ;
+    rdfs:domain vocab:EstadoEstacion ;
+    rdfs:range xsd:boolean .
+
+vocab:distanciaACentroideKm
+    rdf:type rdf:Property ;
+    rdfs:label "distancia al centro de la celda (km)"@es ;
+    rdfs:comment "Distancia Haversine entre la estación y el centro de su celda CAMS; mide qué tan representativa es la celda para la estación."@es ;
+    rdfs:domain vocab:EstacionBicicleta ;
+    rdfs:range xsd:decimal .

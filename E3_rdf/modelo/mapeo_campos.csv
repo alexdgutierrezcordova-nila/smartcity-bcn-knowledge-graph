@@ -1,0 +1,22 @@
+fuente,campo_origen,termino,clase,tipo_valor,preguntas,uso
+CityBikes,stations[].id,data:estacion_{id},vocab:EstacionBicicleta,URI,PC1–PC5; PC11–PC15,Identificador único de la estación en el grafo
+CityBikes,stations[].extra.uid,schema:identifier,vocab:EstacionBicicleta,xsd:string,—,Código del operador; trazabilidad con la fuente
+CityBikes,stations[].name,schema:name,vocab:EstacionBicicleta,xsd:string,PC1–PC5; PC11–PC15,Nombre legible de la estación en las respuestas
+CityBikes,stations[].latitude,geo:lat,vocab:EstacionBicicleta,xsd:decimal,PC3,Ubicación para medir distancia a Plaza Cataluña
+CityBikes,stations[].longitude,geo:long,vocab:EstacionBicicleta,xsd:decimal,PC3,Ubicación para medir distancia a Plaza Cataluña
+CityBikes,latitude + longitude (calculado),vocab:contenidaEnCelda,vocab:EstacionBicicleta,vocab:CeldaModelo,PC6; PC11–PC15,Enlace con la fuente 2: celda CAMS que contiene la estación
+CityBikes,latitude + longitude (calculado),vocab:distanciaACentroideKm,vocab:EstacionBicicleta,xsd:decimal,—,Calidad del enlace: qué tan lejos está la estación del centro de su celda
+CityBikes,network.id,vocab:perteneceARed,vocab:EstacionBicicleta,vocab:RedBicicletas,—,Contexto: red Bicing
+CityBikes,network.company[],vocab:operadaPor,vocab:RedBicicletas,schema:Organization,—,Contexto: operadores de la red
+CityBikes,stations[].timestamp,sosa:resultTime,vocab:EstadoEstacion,xsd:dateTime,PC11–PC15,Instante de la lectura; se alinea con la hora CAMS
+CityBikes,stations[].free_bikes,vocab:bicicletasDisponibles,vocab:EstadoEstacion,xsd:nonNegativeInteger,PC1; PC5; PC11; PC15,Bicicletas listas para retirar
+CityBikes,stations[].empty_slots,vocab:anclajesLibres,vocab:EstadoEstacion,xsd:nonNegativeInteger,PC2; PC5; PC12,Anclajes libres para devolver
+CityBikes,stations[].extra.normal_bikes,vocab:bicicletasMecanicas,vocab:EstadoEstacion,xsd:nonNegativeInteger,—,Desglose del inventario
+CityBikes,stations[].extra.ebikes,vocab:bicicletasElectricas,vocab:EstadoEstacion,xsd:nonNegativeInteger,PC4; PC13,Bicicletas eléctricas disponibles
+CityBikes,stations[].extra.online,vocab:enLinea,vocab:EstadoEstacion,xsd:boolean,—,Estación conectada al sistema
+Open-Meteo,latitude / longitude (corregido a la rejilla 0.1°),geo:lat / geo:long,vocab:CeldaModelo,xsd:decimal,PC6,Centro de la celda CAMS
+Open-Meteo,elevation,schema:elevation,vocab:CeldaModelo,xsd:decimal,—,Altitud media de la celda
+Open-Meteo,hourly.time,sosa:resultTime,vocab:ObservacionCalidadAire,xsd:dateTime,PC6–PC15,Hora de la estimación (UTC)
+Open-Meteo,hourly.nitrogen_dioxide / pm10 / pm2_5 (nombre de la serie),vocab:mideContaminante,vocab:ObservacionCalidadAire,vocab:Contaminante,PC6–PC15,Qué contaminante mide la observación
+Open-Meteo,hourly.nitrogen_dioxide / pm10 / pm2_5 (valor),sosa:hasSimpleResult,vocab:ObservacionCalidadAire,xsd:decimal,PC6–PC15,Concentración en µg/m³
+Open-Meteo,hourly_units,schema:unitText,vocab:Contaminante,xsd:string,—,Unidad de medida (µg/m³)
