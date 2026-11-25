@@ -1,0 +1,202 @@
+[
+  {
+    "estacion": "estacion_0eff392fdff8aeec48b12895678eeb9e",
+    "nombre": "PL. CATALUNYA, 20"
+  },
+  {
+    "estacion": "estacion_fb90b1e2dcf1b2cbb9087f0830ff9df6",
+    "nombre": "PL. CATALUNYA, 5"
+  },
+  {
+    "estacion": "estacion_c99fff35b0450411d06dac8b89f74437",
+    "nombre": "PL. CATALUNYA, 10-11 (LA RAMBLA)"
+  },
+  {
+    "estacion": "estacion_371fdbbe54ad9b4dad4c2348497188ea",
+    "nombre": "PL. CATALUNYA, 10-11 (PG. DE GRÀCIA)"
+  },
+  {
+    "estacion": "estacion_5623abe908c3b96a5aceb962c0273f6a",
+    "nombre": "PL. VICENÇ MARTORELL"
+  },
+  {
+    "estacion": "estacion_43cd75e496ecd2187a03c10902556277",
+    "nombre": "GRAN VIA DE LES CORTS CATALANES , 632"
+  },
+  {
+    "estacion": "estacion_465d5fbd9f725cdd4dbdba1f0612ce64",
+    "nombre": "GRAN VIA DE LES CORTS CATALANES, 609"
+  },
+  {
+    "estacion": "estacion_5eb9bb6fe3eb70e4a3250c05c5e46dc9",
+    "nombre": "C/ VALLDONZELLA, 2"
+  },
+  {
+    "estacion": "estacion_9c3778f6373e6a82078f3609beeb4479",
+    "nombre": "GRAN VIA DE LES CORTS CATALANES, 592"
+  },
+  {
+    "estacion": "estacion_a6233a1762046603bd37d35b0821adbc",
+    "nombre": "C/ DURAN I BAS, 2"
+  },
+  {
+    "estacion": "estacion_4a63c1017c6874ca8491622dded0c3d3",
+    "nombre": "PL. URQUINAONA, 3"
+  },
+  {
+    "estacion": "estacion_f64f7ec154143f871bb06d378e982e0d",
+    "nombre": "PL. CARLES PI I SUNYER"
+  },
+  {
+    "estacion": "estacion_8d1c2df3992c59d06f07e74fa708741a",
+    "nombre": "LA RAMBLA, 101"
+  },
+  {
+    "estacion": "estacion_0d30318c6df68a1f890c2811482d2667",
+    "nombre": "RBLA. CATALUNYA, 33 - C/ DIPUTACIÓ"
+  },
+  {
+    "estacion": "estacion_cca384f10ed51ada861035bb4b17e71f",
+    "nombre": "C/ SANT PERE MÉS ALT, 4"
+  },
+  {
+    "estacion": "estacion_4f0cdc9d1e090de64755ea017b643f1e",
+    "nombre": "PL. UNIVERSITAT"
+  },
+  {
+    "estacion": "estacion_c51f2cc04dcb83a49bd57179df24f94b",
+    "nombre": "PL. UNIVERSITAT / ARIBAU"
+  },
+  {
+    "estacion": "estacion_f4d8965d9acfe29d7b109123ac723c74",
+    "nombre": "RDA. DE SANT PERE, 26"
+  },
+  {
+    "estacion": "estacion_da6b1559f96d6eeb9fcc56d530d88d93",
+    "nombre": "C/ DIPUTACIÓ, 226"
+  },
+  {
+    "estacion": "estacion_a681c273559134ba958488832d05377c",
+    "nombre": "C/ AGUSTÍ DURAN I SANPERE, 10"
+  },
+  {
+    "estacion": "estacion_101580d3395e059b4d12769a5d25d212",
+    "nombre": "C/ DIPUTACIÓ, 272"
+  },
+  {
+    "estacion": "estacion_b5f806177c4eda18fc9ff5a52fd409b1",
+    "nombre": "C/ AGUSTÍ DURAN I SANPERE, 1"
+  },
+  {
+    "estacion": "estacion_1f9e36d7f297b20aa6a1e64d491c7972",
+    "nombre": "RBLA. CATALUNYA, 47"
+  },
+  {
+    "estacion": "estacion_485e3dcc8a771641516691cbcf3631e2",
+    "nombre": "AV. DE LA CATEDRAL, 6"
+  },
+  {
+    "estacion": "estacion_5e5d2776870d78c58607c84eb4db80d6",
+    "nombre": "C/ BRUC, 20"
+  },
+  {
+    "estacion": "estacion_13df1f7cf5da20a4df4f16024b6126f8",
+    "nombre": "LA RAMBLA, 75"
+  },
+  {
+    "estacion": "estacion_5b5bd28eaaea32d5f45aa307a5b306b7",
+    "nombre": "AV. FRANCESC CAMBÓ, 10"
+  },
+  {
+    "estacion": "estacion_d2fc7ac288ba1ad5faf9c1006f94fb99",
+    "nombre": "C/ DIPUTACIÓ, 303"
+  },
+  {
+    "estacion": "estacion_60e5da341ebfa80528cf1fd1995f8310",
+    "nombre": "C/ RIERA ALTA, 6"
+  },
+  {
+    "estacion": "estacion_abe41b077f52ff6dcd89fe331d42cc6c",
+    "nombre": "C/ BRUC, 45"
+  },
+  {
+    "estacion": "estacion_0df71ec07a30c424811aed381fbd0c2c",
+    "nombre": "C/ DIPUTACIÓ, 200"
+  },
+  {
+    "estacion": "estacion_6664971e93f901e063d983180e293d3d",
+    "nombre": "C/ FLORIDABLANCA, 145"
+  },
+  {
+    "estacion": "estacion_2aff2ad9ec4b1b84d6abd6492da2e4e6",
+    "nombre": "C/ BRUC, 66"
+  },
+  {
+    "estacion": "estacion_9c2e3e53b02eb550cda4f0dd07d10828",
+    "nombre": "C/ MÉNDEZ NÚÑEZ, 16"
+  },
+  {
+    "estacion": "estacion_35dee580f2824b604e13f794b0c66262",
+    "nombre": "RAMBLA DEL RAVAL, 13"
+  },
+  {
+    "estacion": "estacion_be0e1c5c9b05385af1c4d7367b54e5bf",
+    "nombre": "LA RAMBLA, 56"
+  },
+  {
+    "estacion": "estacion_23f4d8de839b3faed12399069fc003bb",
+    "nombre": "C/ GOMBAU, 24"
+  },
+  {
+    "estacion": "estacion_6771869a4e86404f73b349215b92369d",
+    "nombre": "PL. SANT MIQUEL, 4"
+  },
+  {
+    "estacion": "estacion_9ff381c81fcba5b01d6aea02a1aec512",
+    "nombre": "C/ VALÈNCIA, 237"
+  },
+  {
+    "estacion": "estacion_85dc8b5af64cd8170cb4d2b437339c75",
+    "nombre": "C/ ENRIC GRANADOS, 35"
+  },
+  {
+    "estacion": "estacion_20b1df9310878ec699cf30978127aef4",
+    "nombre": "C/ CASANOVA, 55"
+  },
+  {
+    "estacion": "estacion_04c1f418a16200483f9ff8d36ffbea54",
+    "nombre": "C/ VILLARROEL, 39"
+  },
+  {
+    "estacion": "estacion_6ab48a3f17b678b7a14b5e1ec31d716c",
+    "nombre": "PG. DE GRÀCIA, 61"
+  },
+  {
+    "estacion": "estacion_08d2c0fa3b24ab7c8cee1149ce4df3d7",
+    "nombre": "C/ BRUC, 88"
+  },
+  {
+    "estacion": "estacion_f5857b295e06b4662db61d3d7fec7a78",
+    "nombre": "RAMBLA DEL RAVAL, 20"
+  },
+  {
+    "estacion": "estacion_545622f1022747ed7f84d5e0d1cf184b",
+    "nombre": "C/ VALÈNCIA, 312 (xamfrà)"
+  },
+  {
+    "estacion": "estacion_be6b8196d1e1535db1e0ac8bd50d4739",
+    "nombre": "C/ BRUC, 102"
+  },
+  {
+    "estacion": "estacion_649a6bce881584f2182784d49e47284e",
+    "nombre": "C/ CASP, 67"
+  },
+  {
+    "estacion": "estacion_084523f98844ad705e48d34b3d667865",
+    "nombre": "PL. TETUAN"
+  },
+  {
+    "estacion": "estacion_f131c8be74d689e7349af47724d88348",
+    "nombre": "C/ COMTE URGELL, 23"
+  }
+]

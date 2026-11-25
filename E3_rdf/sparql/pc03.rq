@@ -1,0 +1,17 @@
+# PC3 · ¿Qué estaciones están a menos de 1 km de Plaza Cataluña (41.38654, 2.16943)?
+# Se compara la distancia al cuadrado (d² < 1 km²) porque SPARQL 1.1 no tiene raíz cuadrada; se ordena de más cerca a más lejos.
+# Distancia equirectangular (error despreciable a esta escala): 1° lat = 110.57 km; 1° lon = 111.32 km · cos(41.39°) = 83.53 km.
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX schema: <https://schema.org/>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX data: <http://example.org/bcn-kg/data/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?estacion ?nombre WHERE {
+  ?e a vocab:EstacionBicicleta ; schema:name ?nombre ; geo:lat ?lat ; geo:long ?lon .
+  BIND((?lat - 41.38654) * 110.57 AS ?dy)
+  BIND((?lon - 2.16943) * 83.53 AS ?dx)
+  BIND(?dx * ?dx + ?dy * ?dy AS ?d2)
+  FILTER(?d2 < 1)
+  BIND(STRAFTER(STR(?e), STR(data:)) AS ?estacion)
+} ORDER BY ?d2

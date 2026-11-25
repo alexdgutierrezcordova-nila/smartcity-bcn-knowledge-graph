@@ -12,10 +12,6 @@
     "nodos": "432"
   },
   {
-    "clase": "https://schema.org/QuantitativeValue",
-    "nodos": "432"
-  },
-  {
     "clase": "http://example.org/bcn-kg/vocab#CeldaModelo",
     "nodos": "4"
   },

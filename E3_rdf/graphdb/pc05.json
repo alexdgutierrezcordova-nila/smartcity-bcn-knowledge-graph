@@ -1,0 +1,52 @@
+[
+  {
+    "estacion": "estacion_31510e5643434782b828ba5d91cff7f0",
+    "nombre": "C/ SANT RAMON DE PENYAFORT, 1",
+    "capacidad": "52"
+  },
+  {
+    "estacion": "estacion_dde5c154868c7fbe8266a3da127514db",
+    "nombre": "GRAN VIA DE LES CORTS CATALANES, 1157 (D)",
+    "capacidad": "52"
+  },
+  {
+    "estacion": "estacion_ba4020a51a4b1ad5d38c730af551134d",
+    "nombre": "C/ RAMON TRIAS FARGAS, 23",
+    "capacidad": "50"
+  },
+  {
+    "estacion": "estacion_cf4f9f6ade2aebdc251e2ff66732280f",
+    "nombre": "AV. LITORAL, 172",
+    "capacidad": "48"
+  },
+  {
+    "estacion": "estacion_564381fdb919b9d87d5fe0401634b667",
+    "nombre": "C/ MARINA, 25-33",
+    "capacidad": "48"
+  },
+  {
+    "estacion": "estacion_1747e401e4657c8c550ffd30791cbfe5",
+    "nombre": "C/ SANCHO DE ÁVILA, 104 - C/ BADAJOZ",
+    "capacidad": "46"
+  },
+  {
+    "estacion": "estacion_c1e818c978c673efb4fb8da5e7e51791",
+    "nombre": "PG. VALL D'HEBRÓN, 168",
+    "capacidad": "45"
+  },
+  {
+    "estacion": "estacion_0ae0e4f1bb5a5d21b268bec539413fde",
+    "nombre": "C/ J. MAYNARD KEYNES, 2|AV. DGNAL.",
+    "capacidad": "44"
+  },
+  {
+    "estacion": "estacion_1c3b749efc8354ce2fe1ca81e9b7a388",
+    "nombre": "GRAN VIA CORTS CATALANES, 760",
+    "capacidad": "44"
+  },
+  {
+    "estacion": "estacion_916b4d2c589fad262929399f082c7571",
+    "nombre": "GRAN VIA DE LES CORTS CATALANES, 375-385",
+    "capacidad": "43"
+  }
+]

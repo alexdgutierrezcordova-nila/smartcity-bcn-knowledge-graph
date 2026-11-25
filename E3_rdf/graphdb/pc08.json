@@ -1,0 +1,17 @@
+[
+  {
+    "celda": "celda_41.45_2.15",
+    "pm25_max": "19.4",
+    "supera": "false"
+  },
+  {
+    "celda": "celda_41.35_2.15",
+    "pm25_max": "13.1",
+    "supera": "false"
+  },
+  {
+    "celda": "celda_41.35_2.25",
+    "pm25_max": "9.7",
+    "supera": "false"
+  }
+]

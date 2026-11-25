@@ -1,0 +1,582 @@
+[
+  {
+    "estacion": "estacion_31510e5643434782b828ba5d91cff7f0",
+    "nombre": "C/ SANT RAMON DE PENYAFORT, 1",
+    "bicicletas": "43"
+  },
+  {
+    "estacion": "estacion_cf4f9f6ade2aebdc251e2ff66732280f",
+    "nombre": "AV. LITORAL, 172",
+    "bicicletas": "41"
+  },
+  {
+    "estacion": "estacion_6b3e985a3214ab5d1e0732c5a00537e8",
+    "nombre": "RAMBLA DE GUIPÚSCOA, 43/FLUVIA",
+    "bicicletas": "37"
+  },
+  {
+    "estacion": "estacion_dde5c154868c7fbe8266a3da127514db",
+    "nombre": "GRAN VIA DE LES CORTS CATALANES, 1157 (D)",
+    "bicicletas": "34"
+  },
+  {
+    "estacion": "estacion_09734124b93865e145f57da0e1a8a096",
+    "nombre": "LA RAMBLA, 1",
+    "bicicletas": "29"
+  },
+  {
+    "estacion": "estacion_fbc62f405e5d474a6ebba1729d90dc79",
+    "nombre": "PG. ZONA FRANCA, 182",
+    "bicicletas": "28"
+  },
+  {
+    "estacion": "estacion_731238b3f7db22b5ac80282218d431f2",
+    "nombre": "C/ FELIPE II, 112",
+    "bicicletas": "26"
+  },
+  {
+    "estacion": "estacion_9162f85a91e3d7da9eac55fb51449657",
+    "nombre": "C/ FERRAN JUNOY, 10",
+    "bicicletas": "26"
+  },
+  {
+    "estacion": "estacion_38ebb650dd9d97eed0737b715bc34c1a",
+    "nombre": "C/ ROC BORONAT, 134",
+    "bicicletas": "26"
+  },
+  {
+    "estacion": "estacion_b9379ff2e8991e872a5640b5aae569d2",
+    "nombre": "PG. DE GARCIA FÀRIA, 37/JOSEP FERRATER",
+    "bicicletas": "25"
+  },
+  {
+    "estacion": "estacion_558a9588c57f132d922efd3be50d01f8",
+    "nombre": "PL. TERESA DE CLARAMUNT/C/ DELS FERROCARILS",
+    "bicicletas": "25"
+  },
+  {
+    "estacion": "estacion_1139f0f7f91f6444cfaec68ec53b8433",
+    "nombre": "RAMBLA DE L'ONZE DE SETEMBRE, 31",
+    "bicicletas": "25"
+  },
+  {
+    "estacion": "estacion_c4e81a9afb47f3d720c2d13b2b3e69b9",
+    "nombre": "C/ JANE ADDAMS, 26/ CRTA. DEL PRAT",
+    "bicicletas": "24"
+  },
+  {
+    "estacion": "estacion_080233252e62b5c4a5f651f1b69e7eff",
+    "nombre": "C/ PALLARS, 182",
+    "bicicletas": "24"
+  },
+  {
+    "estacion": "estacion_91ef690acc5603e3e61a905392e0cf04",
+    "nombre": "C/ PORTUGAL, 3",
+    "bicicletas": "24"
+  },
+  {
+    "estacion": "estacion_c55705a98f23d2296c39a68af7876656",
+    "nombre": "GRAN VIA DE LES CORTS CATALANES, 179 (D)",
+    "bicicletas": "24"
+  },
+  {
+    "estacion": "estacion_0c4cac5891975861c141dbd44374cd54",
+    "nombre": "C/ BILBAO, 2",
+    "bicicletas": "23"
+  },
+  {
+    "estacion": "estacion_6dd5a991ff777d35b32920e749a47112",
+    "nombre": "C/ SELVA DE MAR, 230",
+    "bicicletas": "23"
+  },
+  {
+    "estacion": "estacion_77e6513f3a43c3054c71144be4132e59",
+    "nombre": "C/ BILBAO, 174",
+    "bicicletas": "22"
+  },
+  {
+    "estacion": "estacion_9c003bbd85b2e441cd85d2fe1142f1b9",
+    "nombre": "C/ DE L'ENERGIA, 2 / ALTS FORNS",
+    "bicicletas": "22"
+  },
+  {
+    "estacion": "estacion_408725c15ad93ef162f0e92a0cfec7d1",
+    "nombre": "C/ LOPE DE VEGA, 79",
+    "bicicletas": "22"
+  },
+  {
+    "estacion": "estacion_cbe83a0b2a3af4cd0a86cf4a0e2be928",
+    "nombre": "GRAN VIA DE LES CORTS CATALANES, 1041",
+    "bicicletas": "22"
+  },
+  {
+    "estacion": "estacion_92380b259f2c26fcde401f6f1a369fd3",
+    "nombre": "C/ MALATS, 28-30",
+    "bicicletas": "21"
+  },
+  {
+    "estacion": "estacion_1750df4f9a4a35c6fcdcb16d05a633b4",
+    "nombre": "C/ SANCHO DE ÁVILA, 170 / LLACUNA",
+    "bicicletas": "21"
+  },
+  {
+    "estacion": "estacion_4f7f0e5605acd664b3a57dfe7c90667b",
+    "nombre": "RAMBLA PRIM, 79",
+    "bicicletas": "21"
+  },
+  {
+    "estacion": "estacion_db9e48be6f122b678843577e540f72ea",
+    "nombre": "SELVA DE MAR / PG. DEL TAULAT",
+    "bicicletas": "21"
+  },
+  {
+    "estacion": "estacion_1b5961d97851faaca78308b3afeef662",
+    "nombre": "AV.LITORAL, 84",
+    "bicicletas": "20"
+  },
+  {
+    "estacion": "estacion_3360c263fd39ea95302bf51e7721067e",
+    "nombre": "C/ LLACUNA, 86",
+    "bicicletas": "20"
+  },
+  {
+    "estacion": "estacion_b5c71ae466be2730a78d671a1ddd6ace",
+    "nombre": "C/ LLULL, 309",
+    "bicicletas": "20"
+  },
+  {
+    "estacion": "estacion_c0d5295a77f4cb6e6d6af21c38439874",
+    "nombre": "AV. LITORAL, 72",
+    "bicicletas": "19"
+  },
+  {
+    "estacion": "estacion_0b683b9f2f5596baaea1da793fb36161",
+    "nombre": "C/ JOSEP PLA, 67",
+    "bicicletas": "19"
+  },
+  {
+    "estacion": "estacion_ffbaa273abd20a25367fc85ccfd7330c",
+    "nombre": "C/ RAMON TURRÓ, 246",
+    "bicicletas": "19"
+  },
+  {
+    "estacion": "estacion_1747e401e4657c8c550ffd30791cbfe5",
+    "nombre": "C/ SANCHO DE ÁVILA, 104 - C/ BADAJOZ",
+    "bicicletas": "19"
+  },
+  {
+    "estacion": "estacion_0c539fabc4dc46d8b5ceb3be59fce5d1",
+    "nombre": "CAMPANA DE LA MAQUINISTA (SAO PAULO I PL. DE",
+    "bicicletas": "19"
+  },
+  {
+    "estacion": "estacion_a6fed1c13ea51aa2e2fe9d5631f765f0",
+    "nombre": "PG. DE GARCIA FÀRIA, 21/ESPRONCEDA",
+    "bicicletas": "19"
+  },
+  {
+    "estacion": "estacion_3a2ade138375fbb7e09bd97923442494",
+    "nombre": "C/ BOLIVIA, 120",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_386c55096475077ec2346c1a074a2f21",
+    "nombre": "C/ CASTELLA, 28 / DIAGONAL",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_a1c53aa90947b3c997765873a3a51014",
+    "nombre": "C/ CIUTAT D'ASUNCIÓN, 73 / POTOSÍ",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_f10f219e4f969e8b6940ec1ee720205e",
+    "nombre": "C/ GALLEGO, 2",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_fb06d1360a7658c9cfa20437e2dfd0cf",
+    "nombre": "C/ MARROC, 103",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_417ad16238c60e93946e9c620a3d8401",
+    "nombre": "C/ PALLARS, 504",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_62fb13f795141f7e52d9a318ec66fe08",
+    "nombre": "C/ PAVIA, 3",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_a13269f74bcc2a4674f65cb7b379bfe9",
+    "nombre": "C/ PUJADES, 103",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_205a69a8b9006b34c6170024516fa6ee",
+    "nombre": "C/ PUJADES, 173/RBLA POBLE NOU",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_9db9646e880ada6e547ad2303c1fd1cb",
+    "nombre": "C/ RAMON TURRÓ, 292",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_0d8fa3d220b325a928f1d218b3155113",
+    "nombre": "C/ ROSA SENSAT, 20",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_c130134610be40499ad745cdd23a520d",
+    "nombre": "C/ SARDENYA, 326",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_1369607dbd27029b530192d858bc0587",
+    "nombre": "Carrer Caresmar esq d`Enric Sanchís",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_986b6d406122255e35f3612c23453986",
+    "nombre": "GRAN VIA DE LES CORTS CATALANES, 1062",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_938d6e80af6873d5f085786edde6603c",
+    "nombre": "PG. DE COLOM (LES RAMBLES)",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_d996ea344ed08a9b4e596f2d73e52c4c",
+    "nombre": "PG. OLIMPIC, 8",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_ed25291d0f5edd91615d154f243f82f9",
+    "nombre": "PG.DE COLOM (LES RAMBLES)",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_285fb40978472b0c0755ff451abf3dff",
+    "nombre": "C/ BAC DE RODA, 157",
+    "bicicletas": "17"
+  },
+  {
+    "estacion": "estacion_b531533edea1cbb1febcacfa1b2de898",
+    "nombre": "C/ SELVA DE MAR, 46",
+    "bicicletas": "17"
+  },
+  {
+    "estacion": "estacion_cf7b7020945106c2d6334672818fd7c0",
+    "nombre": "PL. VIRREI AMAT",
+    "bicicletas": "17"
+  },
+  {
+    "estacion": "estacion_f312a0132032a3ac10803bb9e621e117",
+    "nombre": "C/ ARAGÓ, 659 /NAVAS DE TOLOSA",
+    "bicicletas": "16"
+  },
+  {
+    "estacion": "estacion_773b659249bfb4bea3ea7592e540bc1e",
+    "nombre": "C/ CONCEPCIÓ ARENAL, 281",
+    "bicicletas": "16"
+  },
+  {
+    "estacion": "estacion_0df71ec07a30c424811aed381fbd0c2c",
+    "nombre": "C/ DIPUTACIÓ, 200",
+    "bicicletas": "16"
+  },
+  {
+    "estacion": "estacion_c0404e92e0f3547d112fb945e7cb4e0f",
+    "nombre": "C/ PUJADES, 311/ FLUVIÀ",
+    "bicicletas": "16"
+  },
+  {
+    "estacion": "estacion_fcaa1662c358b960bf763c0d1439882f",
+    "nombre": "C/ RAMON TRIAS FARGAS, 21",
+    "bicicletas": "16"
+  },
+  {
+    "estacion": "estacion_845cbafdf23257211a95c9e4011cd13c",
+    "nombre": "C/ RAMON TURRÓ, 182 (xamfrà)",
+    "bicicletas": "16"
+  },
+  {
+    "estacion": "estacion_8f6b673cb8b0b202a6562c9e43efd166",
+    "nombre": "C/RADI,10/GRAN VIA DE LES CORTS CATALANES",
+    "bicicletas": "16"
+  },
+  {
+    "estacion": "estacion_d8ef96f2a72455aea701d6d832370afd",
+    "nombre": "PG. ZONA FRANCA, 9",
+    "bicicletas": "16"
+  },
+  {
+    "estacion": "estacion_90e711b0858b61446652be14b4d549a3",
+    "nombre": "AV. DIAGONAL, 26",
+    "bicicletas": "15"
+  },
+  {
+    "estacion": "estacion_915acbb5e9967f7f8d19535097e2abd2",
+    "nombre": "AV. ICÀRIA, 202",
+    "bicicletas": "15"
+  },
+  {
+    "estacion": "estacion_a477a9cb5e302f3a206d7e45d1976dab",
+    "nombre": "C/ CRISTOBAL DE MOURA, 84",
+    "bicicletas": "15"
+  },
+  {
+    "estacion": "estacion_7be8b5ea66e4126db598f2c674953f92",
+    "nombre": "C/ ROSA SENSAT, 12",
+    "bicicletas": "15"
+  },
+  {
+    "estacion": "estacion_cf23d88209be498ef58d4a397afecf46",
+    "nombre": "C/ SANT ADRIÀ, 113",
+    "bicicletas": "15"
+  },
+  {
+    "estacion": "estacion_04d2405659301888532b220530bf6ab7",
+    "nombre": "C/ SARDENYA, 362",
+    "bicicletas": "15"
+  },
+  {
+    "estacion": "estacion_f3351418bc7b868c203b94a4a4a4d3a3",
+    "nombre": "C/ VALLESPIR, 130",
+    "bicicletas": "15"
+  },
+  {
+    "estacion": "estacion_468cdd79007124037cb4c49834f0f4c4",
+    "nombre": "GRAN VIA DE LES CORTS CATALANES, 981",
+    "bicicletas": "15"
+  },
+  {
+    "estacion": "estacion_ff00e5fcc43ffb93a773a9c35b0a0cb2",
+    "nombre": "PG. DE GARCIA FÀRIA, 85",
+    "bicicletas": "15"
+  },
+  {
+    "estacion": "estacion_084523f98844ad705e48d34b3d667865",
+    "nombre": "PL. TETUAN",
+    "bicicletas": "15"
+  },
+  {
+    "estacion": "estacion_03f8133a557d1706e2bdaa59db24514c",
+    "nombre": "AV. PARAL·LEL, 146 BIS",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_8fd6db8cb80654809347bed85879b49b",
+    "nombre": "C/ ALTS FORNS, 77",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_abe41b077f52ff6dcd89fe331d42cc6c",
+    "nombre": "C/ BRUC, 45",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_649a6bce881584f2182784d49e47284e",
+    "nombre": "C/ CASP, 67",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_ee0ac58184126f8b0c3ed4074e2acb32",
+    "nombre": "C/ GRAN DE LA SAGRERA, 74",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_e6a4d0046fc56369d63e1cdc691f65d1",
+    "nombre": "C/ HONDURAS, 32-34",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_d020d5be58569a2c2206196e603e7ef2",
+    "nombre": "C/ PALAUDÀRIES, 2",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_5e8a9a99852ecd51a4d45c378a80a320",
+    "nombre": "C/ RAMÓN TURRÓ, 160",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_eabcedd1303965a9f8050b1566b9899e",
+    "nombre": "C/ SANT ADRIÀ, 43",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_108f46fa37b199e3a56017d8ae34309e",
+    "nombre": "C/ SANT ISCLE, 60",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_f02902460e1873902ce5cd04c4733484",
+    "nombre": "PG. ZONA FRANCA, 244",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_36a77ee7024d6a550a37897e26e1cc3d",
+    "nombre": "PL. JEAN GENET, 1",
+    "bicicletas": "14"
+  },
+  {
+    "estacion": "estacion_c342ff6ddb36a6954879bb40e3af1d64",
+    "nombre": "C/ CARRERA, 1",
+    "bicicletas": "13"
+  },
+  {
+    "estacion": "estacion_b81ccb25428d4ff0e25482cc54c4cfee",
+    "nombre": "C/ FLORIDABLANCA, 49",
+    "bicicletas": "13"
+  },
+  {
+    "estacion": "estacion_9f58f56f42bcc8b3511501b15d528efd",
+    "nombre": "C/ LLULL, 465",
+    "bicicletas": "13"
+  },
+  {
+    "estacion": "estacion_564381fdb919b9d87d5fe0401634b667",
+    "nombre": "C/ MARINA, 25-33",
+    "bicicletas": "13"
+  },
+  {
+    "estacion": "estacion_3e5d559944765b0a79693f6177076ce1",
+    "nombre": "PG. FABRA I PUIG, 411",
+    "bicicletas": "13"
+  },
+  {
+    "estacion": "estacion_7c21a5ffcb9e694f3a6cae488cfcade5",
+    "nombre": "RAMBLA DE PRIM, 19",
+    "bicicletas": "13"
+  },
+  {
+    "estacion": "estacion_ddd1cf82f9fbc6f46089b086af6e110b",
+    "nombre": "C/ ARIZALA, 77",
+    "bicicletas": "12"
+  },
+  {
+    "estacion": "estacion_2375a6bbc305836292db4b9459bad6c4",
+    "nombre": "C/ CUBELLES, 2",
+    "bicicletas": "12"
+  },
+  {
+    "estacion": "estacion_13cc3757d548c3d88d2cffe8fd10adac",
+    "nombre": "C/ MINERIA, 30",
+    "bicicletas": "12"
+  },
+  {
+    "estacion": "estacion_404e95fdd5b74e1e23f3c5726866ee29",
+    "nombre": "C/ PERE IV, 488",
+    "bicicletas": "12"
+  },
+  {
+    "estacion": "estacion_f3372fefe9287bdfeaec076d7cbc3471",
+    "nombre": "C/ QUETZAL, 22-24",
+    "bicicletas": "12"
+  },
+  {
+    "estacion": "estacion_97a2d55faca5f8980ed77f15bed3427a",
+    "nombre": "C/ SANT ADRIÀ, 88",
+    "bicicletas": "12"
+  },
+  {
+    "estacion": "estacion_c51f2cc04dcb83a49bd57179df24f94b",
+    "nombre": "PL. UNIVERSITAT / ARIBAU",
+    "bicicletas": "12"
+  },
+  {
+    "estacion": "estacion_5c10c2dba1c5a8e8d9dcbb251fd8eab7",
+    "nombre": "RAMBLA DE L'ONZE DE SETEMBRE, 69",
+    "bicicletas": "12"
+  },
+  {
+    "estacion": "estacion_35dee580f2824b604e13f794b0c66262",
+    "nombre": "RAMBLA DEL RAVAL, 13",
+    "bicicletas": "12"
+  },
+  {
+    "estacion": "estacion_d838e012f31b57bf9dc347842df5d1d6",
+    "nombre": "RAMBLA FABRA I PUIG, 67",
+    "bicicletas": "12"
+  },
+  {
+    "estacion": "estacion_dec618417ae38ddec1c28c5f01ef6446",
+    "nombre": "AV. ESTADI, 12",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_2131f17cce068654ea6dd796f6775cc9",
+    "nombre": "AV. PARAL.LEL, 98",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_c1d6af50840a701c9f58c7fa2b9ceab2",
+    "nombre": "C/ CIUTAT DE GRANADA, 165 | AV.DIAGONAL",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_c1cdae8945633fe90d21ec0081cea328",
+    "nombre": "C/ JOAN MIRÓ, 2-12",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_b8309ba8c11cf5b338d6bcbb4867edfa",
+    "nombre": "C/ LISBOA, 1",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_b9758e38f9f3301f45795fb11196c0d9",
+    "nombre": "C/ MONTFAR, 1",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_2ac4f6528d3b970a9fb266edd9776986",
+    "nombre": "C/ PUJADES, 121",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_d1d49e0df5efb64832fb29b9925ad5fe",
+    "nombre": "C/ RAMON TURRÓ, 91",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_7d622bf42f28a204f621fa7205bd0412",
+    "nombre": "C/ SANT ADRIÀ, 28",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_75af56e6daa9b276fdb53d6dbc722cfa",
+    "nombre": "C/ TUCUMÁN, 21",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_871cd416cf79c532d0ecce37f1da4edf",
+    "nombre": "C/ VILAMARÍ, 2",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_b14fe56c969981b87e380a303ce48826",
+    "nombre": "LA BARCELONETA (CN BARCELONETA)",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_7231524b4cb51d780d762ce7c5440ca2",
+    "nombre": "RBLA. BADAL, 73 | C/ CONSTITUCIÓ",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_b6cb8b1a5eb1e771ed4293dd1d1fad5e",
+    "nombre": "RBLA. GUIPÚSCOA, 158",
+    "bicicletas": "11"
+  },
+  {
+    "estacion": "estacion_ed1093b9e37a0c0afcf57114d7aa228d",
+    "nombre": "RONDA DE SANT PAU, 51",
+    "bicicletas": "11"
+  }
+]

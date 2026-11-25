@@ -2,7 +2,7 @@
 
 Crea el repositorio `bcn-kg`, importa el vocabulario y los dos archivos RDF
 (cada uno en su grafo con nombre) y verifica la carga con las consultas de
-E3_rdf/sparql/. Los resultados se guardan en E3_rdf/graphdb/.
+E3_rdf/sparql/ (verificación y preguntas de competencia). Los resultados se guardan en E3_rdf/graphdb/.
 
 Requisito: GraphDB en ejecución, por ejemplo con Docker:
     docker run -d --name graphdb-bcn -p 7200:7200 ontotext/graphdb:10.8.5
@@ -24,7 +24,7 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parents[2]
 REPO = "bcn-kg"
 GRAFOS = {
-    "http://example.org/bcn-kg/graph/vocab": RAIZ / "E2_extraccion" / "modelo" / "vocab.ttl",
+    "http://example.org/bcn-kg/graph/vocab": RAIZ / "E3_rdf" / "modelo" / "vocab.ttl",
     "http://example.org/bcn-kg/graph/bicing": RAIZ / "E3_rdf" / "rdf" / "bicing.ttl",
     "http://example.org/bcn-kg/graph/calidad_aire": RAIZ / "E3_rdf" / "rdf" / "calidad_aire.ttl",
 }
@@ -91,12 +91,14 @@ def consultar(base: str, consulta: str) -> list[dict]:
 def verificar(base: str) -> None:
     """Ejecuta las consultas de verificación y guarda sus resultados en JSON."""
     DIR_RESULTADOS.mkdir(parents=True, exist_ok=True)
-    for ruta in sorted(DIR_SPARQL.glob("0[1-3]_*.rq")):
+    rutas = sorted(DIR_SPARQL.glob("0[1-3]_*.rq")) + sorted(DIR_SPARQL.glob("pc*.rq"))
+    for ruta in rutas:
         filas = consultar(base, ruta.read_text(encoding="utf-8"))
         (DIR_RESULTADOS / f"{ruta.stem}.json").write_text(
             json.dumps(filas, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"\n{ruta.name}")
-        for f in filas:
+        print(f"  {len(filas)} filas")
+        for f in filas[:3]:
             print("  " + " | ".join(f.values()))
 
 

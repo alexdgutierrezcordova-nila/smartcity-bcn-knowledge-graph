@@ -1,7 +1,7 @@
 """Entregable 3 — Generación de datos RDF (Smart City Barcelona).
 
 Convierte los CSV limpios del Entregable 2 en RDF (Turtle) siguiendo el
-modelo validado (E2_extraccion/modelo/vocab.ttl y modelo_datos.png).
+modelo v2 (E3_rdf/modelo/vocab.ttl y modelo_datos.png).
 
 Salidas en E3_rdf/rdf/:
     bicing.ttl        Fuente 1: red Bicing, operadores, estaciones y estados.
@@ -30,7 +30,7 @@ import preprocesar
 # ---------------------------------------------------------------------------
 RAIZ = Path(__file__).resolve().parents[2]
 DIR_PROCESADOS = RAIZ / "E2_extraccion" / "data" / "processed"
-RUTA_VOCAB = RAIZ / "E2_extraccion" / "modelo" / "vocab.ttl"
+RUTA_VOCAB = RAIZ / "E3_rdf" / "modelo" / "vocab.ttl"
 DIR_SALIDA = RAIZ / "E3_rdf" / "rdf"
 
 # Una sola URI base para TODAS las fuentes: así los nodos comunes se enlazan.
@@ -39,10 +39,11 @@ VOCAB = Namespace("http://example.org/bcn-kg/vocab#")
 SCHEMA = Namespace("https://schema.org/")
 SOSA = Namespace("http://www.w3.org/ns/sosa/")
 GEO = Namespace("http://www.w3.org/2003/01/geo/wgs84_pos#")
+DBR = Namespace("http://dbpedia.org/resource/")
 
 PREFIJOS = {
     "data": DATA, "vocab": VOCAB, "schema": SCHEMA, "sosa": SOSA,
-    "geo": GEO, "dcterms": DCTERMS, "rdfs": RDFS, "xsd": XSD,
+    "geo": GEO, "dcterms": DCTERMS, "rdfs": RDFS, "xsd": XSD, "dbr": DBR,
 }
 
 
@@ -92,16 +93,11 @@ def uri_celda(id_celda: str) -> URIRef:
 
 
 def uri_contaminante(codigo: str) -> URIRef:
-    # Coincide con las instancias ya declaradas en vocab.ttl (data:contaminante_NO2).
     return DATA[f"contaminante_{normalizar(codigo)}"]
 
 
 def uri_observacion(id_celda: str, hora_utc: str, codigo: str) -> URIRef:
     return DATA[f"obs_{normalizar(id_celda)}_{compactar_fecha(hora_utc)}_{normalizar(codigo)}"]
-
-
-def uri_resultado(uri_obs: URIRef) -> URIRef:
-    return URIRef(str(uri_obs).replace("/obs_", "/resultado_"))
 
 
 # ---------------------------------------------------------------------------
@@ -154,6 +150,16 @@ def url_y_fecha(procedencia: pd.DataFrame, fuente: str) -> tuple[str, str]:
 # ---------------------------------------------------------------------------
 # Fuente 1: CityBikes (Bicing)
 # ---------------------------------------------------------------------------
+def agregar_ciudad(g: Graph) -> URIRef:
+    """Barcelona como schema:Place, enlazada a DBpedia. Se declara en ambas fuentes
+    con las mismas tripletas, así cada archivo queda completo por sí solo."""
+    ciudad = uri_ciudad()
+    g.add((ciudad, RDF.type, SCHEMA.Place))
+    g.add((ciudad, SCHEMA.name, Literal("Barcelona")))
+    g.add((ciudad, SCHEMA.sameAs, DBR.Barcelona))
+    return ciudad
+
+
 def generar_bicing(dfs: dict[str, pd.DataFrame]) -> Graph:
     """Instancia RedBicicletas, Organization, EstacionBicicleta y EstadoEstacion."""
     g = nuevo_grafo()
@@ -163,15 +169,15 @@ def generar_bicing(dfs: dict[str, pd.DataFrame]) -> Graph:
     g.add((red, RDF.type, VOCAB.RedBicicletas))
     g.add((red, SCHEMA.identifier, Literal("bicing")))
     g.add((red, SCHEMA.name, Literal("Bicing")))
-    g.add((red, DCTERMS.spatial, Literal("Barcelona")))
+    g.add((red, SCHEMA.areaServed, agregar_ciudad(g)))
     g.add((red, SCHEMA.url, Literal(url, datatype=XSD.anyURI)))
+    g.add((red, SCHEMA.sameAs, DBR.Bicing))
 
     for op in dfs["citybikes_operadores"].itertuples():
         u = uri_operador(op.nombre)
         g.add((u, RDF.type, SCHEMA.Organization))
         g.add((u, SCHEMA.identifier, Literal(normalizar(op.nombre))))
         g.add((u, SCHEMA.name, Literal(op.nombre)))
-        g.add((u, SCHEMA.address, Literal("Barcelona, ES")))
         g.add((red, VOCAB.operadaPor, u))
 
     enlace = dfs["enlace_estacion_celda"].set_index("id_estacion")
@@ -199,7 +205,6 @@ def generar_bicing(dfs: dict[str, pd.DataFrame]) -> Graph:
         u = uri_estado(s.id_estacion, s.captura_utc)
         estacion = uri_estacion(s.id_estacion)
         g.add((u, RDF.type, VOCAB.EstadoEstacion))
-        g.add((estacion, VOCAB.tieneEstado, u))
         g.add((u, SOSA.hasFeatureOfInterest, estacion))
         g.add((u, SOSA.resultTime, fecha_hora(s.captura_utc)))
         for propiedad, columna in columnas.items():
@@ -213,19 +218,18 @@ def generar_bicing(dfs: dict[str, pd.DataFrame]) -> Graph:
 # ---------------------------------------------------------------------------
 # Fuente 2: Open-Meteo (CAMS)
 # ---------------------------------------------------------------------------
-NOMBRES_CONTAMINANTE = {"NO2": "Dióxido de nitrógeno", "PM10": "Material particulado PM10",
-                        "PM2_5": "Material particulado PM2.5"}
+CONTAMINANTES = {  # código -> (nombre, recurso DBpedia relacionado)
+    "NO2": ("Dióxido de nitrógeno", DBR.Nitrogen_dioxide),
+    "PM10": ("Material particulado PM10", DBR.Particulates),
+    "PM2_5": ("Material particulado PM2.5", DBR.Particulates),
+}
 
 
 def generar_calidad_aire(dfs: dict[str, pd.DataFrame]) -> Graph:
-    """Instancia Place (Barcelona), CeldaModelo, Contaminante,
-    ObservacionCalidadAire y su QuantitativeValue."""
+    """Instancia Place (Barcelona), CeldaModelo, Contaminante y ObservacionCalidadAire."""
     g = nuevo_grafo()
     _, extraido = url_y_fecha(dfs["procedencia"], "openmeteo")
-
-    ciudad = uri_ciudad()
-    g.add((ciudad, RDF.type, SCHEMA.Place))
-    g.add((ciudad, SCHEMA.name, Literal("Barcelona")))
+    ciudad = agregar_ciudad(g)
 
     for c in dfs["openmeteo_celdas"].itertuples():
         u = uri_celda(c.id_celda)
@@ -240,28 +244,27 @@ def generar_calidad_aire(dfs: dict[str, pd.DataFrame]) -> Graph:
         g.add((u, SCHEMA.containedInPlace, ciudad))
 
     obs = dfs["openmeteo_observaciones"]
+    unidades = obs.groupby("contaminante").unidad.first()
     for codigo in sorted(obs.contaminante.unique()):
+        nombre, recurso = CONTAMINANTES.get(codigo, (codigo, None))
         u = uri_contaminante(codigo)
         g.add((u, RDF.type, VOCAB.Contaminante))
-        g.add((u, DCTERMS.identifier, Literal(codigo)))
-        g.add((u, SCHEMA.name, Literal(NOMBRES_CONTAMINANTE.get(codigo, codigo), lang="es")))
+        g.add((u, SCHEMA.identifier, Literal(codigo)))
+        g.add((u, SCHEMA.name, Literal(nombre, lang="es")))
+        # La unidad es la misma para todas las observaciones de un contaminante.
+        g.add((u, SCHEMA.unitText, Literal(unidades[codigo])))
+        g.add((u, SCHEMA.unitCode, Literal("GQ")))  # UN/CEFACT: microgramo por metro cúbico
+        if recurso:
+            g.add((u, RDFS.seeAlso, recurso))
 
     for o in obs.dropna(subset=["valor"]).itertuples():
         u = uri_observacion(o.id_celda, o.hora_utc, o.contaminante)
-        r = uri_resultado(u)
         g.add((u, RDF.type, VOCAB.ObservacionCalidadAire))
-        g.add((u, DCTERMS.identifier, Literal(str(u).rsplit("/", 1)[-1])))
         g.add((u, SOSA.hasFeatureOfInterest, uri_celda(o.id_celda)))
         g.add((u, VOCAB.mideContaminante, uri_contaminante(o.contaminante)))
         g.add((u, SOSA.resultTime, fecha_hora(o.hora_utc)))
         g.add((u, SOSA.hasSimpleResult, decimal(o.valor)))
         g.add((u, DCTERMS.issued, fecha_hora(extraido)))
-        g.add((u, SOSA.hasResult, r))
-        g.add((r, RDF.type, SCHEMA.QuantitativeValue))
-        g.add((r, SCHEMA.value, decimal(o.valor)))
-        g.add((r, SCHEMA.unitText, Literal(o.unidad)))
-        g.add((r, SCHEMA.unitCode, Literal("GQ")))  # UN/CEFACT: microgram per cubic metre
-        g.add((r, SCHEMA.minValue, decimal("0.0")))
     return g
 
 

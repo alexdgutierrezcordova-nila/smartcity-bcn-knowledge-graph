@@ -1,0 +1,12 @@
+# PC4 · ¿Qué estaciones tienen bicicletas eléctricas disponibles?
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX schema: <https://schema.org/>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX data: <http://example.org/bcn-kg/data/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?estacion ?nombre ?electricas WHERE {
+  ?estado a vocab:EstadoEstacion ; sosa:hasFeatureOfInterest ?e ; vocab:bicicletasElectricas ?electricas .
+  ?e schema:name ?nombre . BIND(STRAFTER(STR(?e), STR(data:)) AS ?estacion)
+  FILTER(?electricas > 0)
+} ORDER BY DESC(?electricas) ?nombre

@@ -1,0 +1,17 @@
+# PC15 · [Integrada] ¿Qué estaciones tienen 1 bicicleta o menos y están en celdas con NO2 > 40 µg/m³ a la hora H?
+# H = "2026-11-12T17:00:00+00:00"^^xsd:dateTime.
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX schema: <https://schema.org/>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX data: <http://example.org/bcn-kg/data/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?estacion ?nombre ?bicicletas ?celda ?no2 WHERE {
+  ?estado sosa:hasFeatureOfInterest ?e ; vocab:bicicletasDisponibles ?bicicletas .
+  FILTER(?bicicletas <= 1)
+  ?e schema:name ?nombre ; vocab:contenidaEnCelda ?c .
+  ?o sosa:hasFeatureOfInterest ?c ; vocab:mideContaminante data:contaminante_NO2 ;
+     sosa:resultTime "2026-11-12T17:00:00+00:00"^^xsd:dateTime ; sosa:hasSimpleResult ?no2 .
+  FILTER(?no2 > 40)
+  BIND(STRAFTER(STR(?e), STR(data:)) AS ?estacion) BIND(STRAFTER(STR(?c), STR(data:)) AS ?celda)
+} ORDER BY DESC(?no2) ?nombre

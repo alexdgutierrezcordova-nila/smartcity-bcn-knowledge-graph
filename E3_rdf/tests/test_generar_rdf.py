@@ -19,11 +19,22 @@ def test_celdas_enlazan_ambas_fuentes_con_la_misma_uri():
     assert celdas_bicing and celdas_bicing <= celdas_aire
 
 
-def test_contaminantes_coinciden_con_instancias_de_vocab():
-    _, ga = m.ejecutar(limite=2, guardar=False)
+def test_vocab_v2_solo_define_el_modelo_y_contaminantes_tienen_unidad():
     vocab = Graph().parse(m.RUTA_VOCAB)
-    usados = set(ga.subjects(RDF.type, m.VOCAB.Contaminante))
-    assert usados <= set(vocab.subjects(RDF.type, m.VOCAB.Contaminante))
+    assert not list(vocab.subjects(RDF.type, m.VOCAB.Contaminante))  # sin datos en el TBox
+    _, ga = m.ejecutar(limite=2, guardar=False)
+    for c in ga.subjects(RDF.type, m.VOCAB.Contaminante):
+        assert ga.value(c, m.SCHEMA.unitText) is not None
+
+
+def test_modelo_v2_sin_terminos_redundantes():
+    gb, ga = m.ejecutar(limite=0, guardar=False)
+    g = gb + ga
+    assert not list(g.triples((None, m.VOCAB.tieneEstado, None)))
+    assert not list(g.subjects(RDF.type, m.SCHEMA.QuantitativeValue))
+    # Los estados llegan a su estación solo con sosa:hasFeatureOfInterest
+    estados = set(g.subjects(RDF.type, m.VOCAB.EstadoEstacion))
+    assert all(g.value(e, m.SOSA.hasFeatureOfInterest) for e in estados)
 
 
 def test_validar_detecta_rango_incorrecto_y_nodo_sin_describir():

@@ -1,0 +1,38 @@
+[
+  {
+    "celda": "celda_41.45_2.15",
+    "dia": "2026-11-11",
+    "pm10_medio": "15.5",
+    "supera": "false"
+  },
+  {
+    "celda": "celda_41.35_2.15",
+    "dia": "2026-11-11",
+    "pm10_medio": "11.8",
+    "supera": "false"
+  },
+  {
+    "celda": "celda_41.35_2.25",
+    "dia": "2026-11-11",
+    "pm10_medio": "9",
+    "supera": "false"
+  },
+  {
+    "celda": "celda_41.45_2.15",
+    "dia": "2026-11-12",
+    "pm10_medio": "5.6",
+    "supera": "false"
+  },
+  {
+    "celda": "celda_41.35_2.15",
+    "dia": "2026-11-12",
+    "pm10_medio": "5",
+    "supera": "false"
+  },
+  {
+    "celda": "celda_41.35_2.25",
+    "dia": "2026-11-12",
+    "pm10_medio": "4.8",
+    "supera": "false"
+  }
+]

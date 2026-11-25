@@ -1,0 +1,13 @@
+# PC7 · ¿En qué celdas la media diaria de PM10 superó el valor guía OMS (45 µg/m³ en 24 h)?
+# Se muestran todas las medias diarias; la columna supera indica si se pasó el umbral.
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX schema: <https://schema.org/>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX data: <http://example.org/bcn-kg/data/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?celda ?dia (ROUND(AVG(?v) * 10) / 10 AS ?pm10_medio) (AVG(?v) > 45 AS ?supera) WHERE {
+  ?o a vocab:ObservacionCalidadAire ; sosa:hasFeatureOfInterest ?c ;
+     vocab:mideContaminante data:contaminante_PM10 ; sosa:resultTime ?t ; sosa:hasSimpleResult ?v .
+  BIND(SUBSTR(STR(?t), 1, 10) AS ?dia) BIND(STRAFTER(STR(?c), STR(data:)) AS ?celda)
+} GROUP BY ?celda ?dia ORDER BY DESC(?pm10_medio)

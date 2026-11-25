@@ -1,0 +1,42 @@
+[
+  {
+    "estacion": "estacion_f10f219e4f969e8b6940ec1ee720205e",
+    "nombre": "C/ GALLEGO, 2",
+    "bicicletas": "18"
+  },
+  {
+    "estacion": "estacion_2b993294c8972929fed281e92891f252",
+    "nombre": "C/ GRAN DE GRÀCIA, 91",
+    "bicicletas": "1"
+  },
+  {
+    "estacion": "estacion_b5c71ae466be2730a78d671a1ddd6ace",
+    "nombre": "C/ LLULL, 309",
+    "bicicletas": "20"
+  },
+  {
+    "estacion": "estacion_85754ee6b3be59b9e61376c7d72cd0eb",
+    "nombre": "C/ MAIGNON, 31-41",
+    "bicicletas": "0"
+  },
+  {
+    "estacion": "estacion_9822bbdbb55cf9802b6d8e92d62bbb66",
+    "nombre": "C/GAVÀ, 81",
+    "bicicletas": "1"
+  },
+  {
+    "estacion": "estacion_8d1c2df3992c59d06f07e74fa708741a",
+    "nombre": "LA RAMBLA, 101",
+    "bicicletas": "0"
+  },
+  {
+    "estacion": "estacion_13df1f7cf5da20a4df4f16024b6126f8",
+    "nombre": "LA RAMBLA, 75",
+    "bicicletas": "0"
+  },
+  {
+    "estacion": "estacion_f8756b6af18c2fedd8a295040279aecc",
+    "nombre": "PL. POETA BOSCÀ | C/ ATLÀNTIDA",
+    "bicicletas": "0"
+  }
+]

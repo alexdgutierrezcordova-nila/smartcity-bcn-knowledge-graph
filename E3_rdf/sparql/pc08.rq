@@ -1,0 +1,12 @@
+# PC8 · ¿Qué celdas registran PM2.5 horario > 25 µg/m³? Se listan los máximos por celda y si superan.
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX schema: <https://schema.org/>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX data: <http://example.org/bcn-kg/data/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?celda (MAX(?v) AS ?pm25_max) (MAX(?v) > 25 AS ?supera) WHERE {
+  ?o a vocab:ObservacionCalidadAire ; sosa:hasFeatureOfInterest ?c ;
+     vocab:mideContaminante data:contaminante_PM2_5 ; sosa:hasSimpleResult ?v .
+  BIND(STRAFTER(STR(?c), STR(data:)) AS ?celda)
+} GROUP BY ?celda ORDER BY DESC(?pm25_max)

@@ -1,0 +1,15 @@
+# PC6 · ¿Cuál es el NO2 de la celda CAMS que contiene Plaza Cataluña a la hora H?
+# H = "2026-11-12T17:00:00+00:00"^^xsd:dateTime: hora más cercana a la captura de Bicing (16:30 UTC, ±30 min).
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX schema: <https://schema.org/>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX data: <http://example.org/bcn-kg/data/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?celda ?no2 WHERE {
+  ?c a vocab:CeldaModelo ; geo:lat ?lat ; geo:long ?lon .
+  FILTER(41.38654 >= ?lat - 0.05 && 41.38654 < ?lat + 0.05 && 2.16943 >= ?lon - 0.05 && 2.16943 < ?lon + 0.05)
+  ?o a vocab:ObservacionCalidadAire ; sosa:hasFeatureOfInterest ?c ;
+     vocab:mideContaminante data:contaminante_NO2 ; sosa:resultTime "2026-11-12T17:00:00+00:00"^^xsd:dateTime ; sosa:hasSimpleResult ?no2 .
+  BIND(STRAFTER(STR(?c), STR(data:)) AS ?celda)
+}
