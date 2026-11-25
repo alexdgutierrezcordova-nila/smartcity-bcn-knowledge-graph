@@ -1,0 +1,5 @@
+id_celda,latitud_celda,longitud_celda,elevacion,puntos_muestreo
+celda_41.35_2.15,41.35,2.15,24.0,3
+celda_41.35_2.25,41.35,2.25,6.0,1
+celda_41.45_2.15,41.45,2.15,66.0,2
+celda_41.45_2.25,41.45,2.25,,0

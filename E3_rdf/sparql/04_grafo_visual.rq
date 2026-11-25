@@ -1,0 +1,20 @@
+# Subgrafo de ejemplo para la captura (GraphDB > SPARQL > CONSTRUCT > "Visual"):
+# una estacion con su red, operadores, estado, celda CAMS y las 3 observaciones de una hora.
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX sosa:  <http://www.w3.org/ns/sosa/>
+PREFIX schema: <https://schema.org/>
+PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
+CONSTRUCT {
+  ?e vocab:perteneceARed ?red ; vocab:tieneEstado ?st ; vocab:contenidaEnCelda ?c .
+  ?red vocab:operadaPor ?op .
+  ?c schema:containedInPlace ?ciudad .
+  ?o sosa:hasFeatureOfInterest ?c ; vocab:mideContaminante ?k ; sosa:hasResult ?r .
+}
+WHERE {
+  { SELECT ?e WHERE { ?e a vocab:EstacionBicicleta ; vocab:contenidaEnCelda ?x } ORDER BY ?e LIMIT 1 }
+  ?e vocab:perteneceARed ?red ; vocab:tieneEstado ?st ; vocab:contenidaEnCelda ?c .
+  ?red vocab:operadaPor ?op .
+  ?c schema:containedInPlace ?ciudad .
+  ?o sosa:hasFeatureOfInterest ?c ; vocab:mideContaminante ?k ; sosa:hasResult ?r ;
+     sosa:resultTime "2026-11-12T12:00:00+00:00"^^xsd:dateTime .
+}

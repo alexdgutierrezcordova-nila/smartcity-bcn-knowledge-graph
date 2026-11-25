@@ -1,0 +1,2 @@
+# Total de tripletas cargadas
+SELECT (COUNT(*) AS ?tripletas) WHERE { ?s ?p ?o }

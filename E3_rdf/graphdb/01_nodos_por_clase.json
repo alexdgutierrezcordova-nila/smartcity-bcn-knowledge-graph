@@ -1,0 +1,38 @@
+[
+  {
+    "clase": "http://example.org/bcn-kg/vocab#EstacionBicicleta",
+    "nodos": "542"
+  },
+  {
+    "clase": "http://example.org/bcn-kg/vocab#EstadoEstacion",
+    "nodos": "542"
+  },
+  {
+    "clase": "http://example.org/bcn-kg/vocab#ObservacionCalidadAire",
+    "nodos": "432"
+  },
+  {
+    "clase": "https://schema.org/QuantitativeValue",
+    "nodos": "432"
+  },
+  {
+    "clase": "http://example.org/bcn-kg/vocab#CeldaModelo",
+    "nodos": "4"
+  },
+  {
+    "clase": "http://example.org/bcn-kg/vocab#Contaminante",
+    "nodos": "3"
+  },
+  {
+    "clase": "https://schema.org/Organization",
+    "nodos": "3"
+  },
+  {
+    "clase": "http://example.org/bcn-kg/vocab#RedBicicletas",
+    "nodos": "1"
+  },
+  {
+    "clase": "https://schema.org/Place",
+    "nodos": "1"
+  }
+]

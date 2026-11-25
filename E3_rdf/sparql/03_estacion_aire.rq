@@ -1,0 +1,14 @@
+# Consulta integrada: estaciones Bicing y NO2 medio de la celda CAMS que las contiene
+PREFIX vocab:  <http://example.org/bcn-kg/vocab#>
+PREFIX schema: <https://schema.org/>
+PREFIX sosa:   <http://www.w3.org/ns/sosa/>
+PREFIX data:   <http://example.org/bcn-kg/data/>
+SELECT ?celda (COUNT(DISTINCT ?estacion) AS ?estaciones) (ROUND(AVG(?no2) * 100) / 100 AS ?no2_medio)
+WHERE {
+  ?estacion a vocab:EstacionBicicleta ;
+            vocab:contenidaEnCelda ?celda .
+  ?obs sosa:hasFeatureOfInterest ?celda ;
+       vocab:mideContaminante data:contaminante_NO2 ;
+       sosa:hasSimpleResult ?no2 .
+}
+GROUP BY ?celda
