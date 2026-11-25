@@ -65,7 +65,7 @@ def ejecutar_ciclo_captura(
     archivo_cb = f"citybikes_bicing_{ts_cb}Z.json"
     registrar_procedencia(
         ruta_registro_csv=procedencia_csv,
-        archivo_raw=str(dir_citybikes / archivo_cb),
+        archivo_raw=f"data/raw/citybikes/{archivo_cb}",  # relative: no local user paths
         url=sobre_cb["url"],
         extraido_utc=sobre_cb["extraido_utc"],
         http_status=sobre_cb["http_status"],
@@ -89,7 +89,7 @@ def ejecutar_ciclo_captura(
     archivo_om = f"openmeteo_cams_{ts_om}Z.json"
     registrar_procedencia(
         ruta_registro_csv=procedencia_csv,
-        archivo_raw=str(dir_openmeteo / archivo_om),
+        archivo_raw=f"data/raw/openmeteo/{archivo_om}",  # relative: no local user paths
         url=sobre_om["url"],
         extraido_utc=sobre_om["extraido_utc"],
         http_status=sobre_om["http_status"],
