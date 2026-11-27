@@ -34,6 +34,9 @@ Las clases extra (`sosa:Observation` = 974, `sosa:FeatureOfInterest` = 546, `sch
 las estaciones (Bicing) se conectan con la celda CAMS (nodo puente).
 
 ## 4. Preguntas de competencia
+Todas las consultas ya están guardadas en el Workbench: **SPARQL** → icono de carpeta (*Show saved queries*)
+→ elegir `PC01` … `PC15` (o `01`–`05`) → **Run**. Las registra `cargar_graphdb.py`.
+
 **SPARQL** → pegar el contenido de `E3_rdf/sparql/pc11.rq` (integrada) y ejecutar.
 Devuelve las estaciones con 5 o más bicicletas en celdas con NO₂ ≤ 25 µg/m³ a las 17:00 UTC (183 filas).
 Cada pregunta PC1–PC15 tiene su archivo `pcNN.rq` en la misma carpeta.

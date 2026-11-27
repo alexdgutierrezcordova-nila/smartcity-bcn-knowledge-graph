@@ -105,6 +105,29 @@ def verificar(base: str) -> None:
             print("  " + " | ".join(f.values()))
 
 
+def nombre_consulta(ruta: Path) -> str:
+    """Nombre visible en GraphDB: código del archivo + su primera línea de comentario."""
+    titulo = ruta.read_text(encoding="utf-8").splitlines()[0].lstrip("# ").strip()
+    if ruta.stem.startswith("pc"):
+        # «PC1 · pregunta» → «PC01 · pregunta», para que el Workbench las ordene bien
+        return f"PC{ruta.stem[2:]} · {titulo.split('·', 1)[1].strip()}"
+    return f"{ruta.stem[:2]} · {titulo}"
+
+
+def guardar_consultas(base: str) -> None:
+    """Registra cada .rq como consulta guardada del Workbench (SPARQL → carpeta de consultas guardadas)."""
+    url = f"{base}/rest/sparql/saved-queries"
+    for ruta in sorted(DIR_SPARQL.glob("*.rq")):
+        nombre = nombre_consulta(ruta)
+        try:  # reemplaza la versión anterior si ya existía
+            peticion(f"{url}?name={urllib.parse.quote(nombre)}", "DELETE")
+        except urllib.error.HTTPError:
+            pass
+        cuerpo = json.dumps({"name": nombre, "body": ruta.read_text(encoding="utf-8"), "shared": True}).encode()
+        peticion(url, "POST", cuerpo, {"Content-Type": "application/json"})
+    print(f"\n{len(list(DIR_SPARQL.glob('*.rq')))} consultas guardadas en el Workbench")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Carga los datos RDF en GraphDB")
     parser.add_argument("--url", default="http://localhost:7200")
@@ -113,5 +136,6 @@ if __name__ == "__main__":
         crear_repositorio(args.url)
         importar(args.url)
         verificar(args.url)
+        guardar_consultas(args.url)
     except urllib.error.URLError as e:
         raise SystemExit(f"No se pudo conectar con GraphDB en {args.url}: {e}")
