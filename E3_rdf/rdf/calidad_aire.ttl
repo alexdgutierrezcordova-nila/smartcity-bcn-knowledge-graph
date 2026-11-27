@@ -9,7 +9,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 data:celda_41.45_2.25 a vocab:CeldaModelo ;
-    dcterms:source "Copernicus CAMS 0.1°" ;
+    dcterms:source "Copernicus CAMS European (Open-Meteo domains=auto, rejilla 0.1°)" ;
     geo:lat 41.45 ;
     geo:long 2.25 ;
     schema:containedInPlace data:Barcelona ;
@@ -3045,7 +3045,7 @@ data:Barcelona a schema:Place ;
     schema:sameAs dbr:Barcelona .
 
 data:celda_41.35_2.15 a vocab:CeldaModelo ;
-    dcterms:source "Copernicus CAMS 0.1°" ;
+    dcterms:source "Copernicus CAMS European (Open-Meteo domains=auto, rejilla 0.1°)" ;
     geo:lat 41.35 ;
     geo:long 2.15 ;
     schema:containedInPlace data:Barcelona ;
@@ -3054,7 +3054,7 @@ data:celda_41.35_2.15 a vocab:CeldaModelo ;
     schema:name "Celda CAMS Barcelona 41.35_2.15" .
 
 data:celda_41.35_2.25 a vocab:CeldaModelo ;
-    dcterms:source "Copernicus CAMS 0.1°" ;
+    dcterms:source "Copernicus CAMS European (Open-Meteo domains=auto, rejilla 0.1°)" ;
     geo:lat 41.35 ;
     geo:long 2.25 ;
     schema:containedInPlace data:Barcelona ;
@@ -3063,7 +3063,7 @@ data:celda_41.35_2.25 a vocab:CeldaModelo ;
     schema:name "Celda CAMS Barcelona 41.35_2.25" .
 
 data:celda_41.45_2.15 a vocab:CeldaModelo ;
-    dcterms:source "Copernicus CAMS 0.1°" ;
+    dcterms:source "Copernicus CAMS European (Open-Meteo domains=auto, rejilla 0.1°)" ;
     geo:lat 41.45 ;
     geo:long 2.15 ;
     schema:containedInPlace data:Barcelona ;

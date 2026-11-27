@@ -193,7 +193,7 @@ def generar_bicing(dfs: dict[str, pd.DataFrame]) -> Graph:
             fila = enlace.loc[est.id_estacion]
             # Nodo puente con la Fuente 2: misma URI de celda que en calidad_aire.ttl
             g.add((u, VOCAB.contenidaEnCelda, uri_celda(fila.id_celda)))
-            g.add((u, VOCAB.distanciaACentroideKm, decimal(fila.distancia_centro_km)))
+            g.add((u, VOCAB.distanciaACeldaModeloKm, decimal(fila.distancia_celda_modelo_km)))
 
     columnas = {
         VOCAB.bicicletasDisponibles: "free_bikes",
@@ -240,7 +240,7 @@ def generar_calidad_aire(dfs: dict[str, pd.DataFrame]) -> Graph:
         g.add((u, GEO.long, decimal(c.longitud_celda)))
         if pd.notna(c.elevacion):
             g.add((u, SCHEMA.elevation, decimal(c.elevacion)))
-        g.add((u, DCTERMS.source, Literal("Copernicus CAMS 0.1°")))
+        g.add((u, DCTERMS.source, Literal("Copernicus CAMS European (Open-Meteo domains=auto, rejilla 0.1°)")))
         g.add((u, SCHEMA.containedInPlace, ciudad))
 
     obs = dfs["openmeteo_observaciones"]

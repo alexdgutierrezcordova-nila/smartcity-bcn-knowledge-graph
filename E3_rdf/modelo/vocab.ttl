@@ -47,7 +47,7 @@ vocab:CeldaModelo
     rdf:type rdfs:Class ;
     rdfs:subClassOf schema:Place , sosa:FeatureOfInterest ;
     rdfs:label "Celda del modelo CAMS"@es ;
-    rdfs:comment "Cuadrícula de 0.1° x 0.1° del modelo europeo CAMS. Es lo que observa cada ObservacionCalidadAire y el nodo puente con las estaciones."@es .
+    rdfs:comment "Cuadrícula de 0.1° x 0.1° del modelo europeo CAMS. Sus geo:lat y geo:long son el punto central (centroide) de la cuadrícula. Es lo que observa cada ObservacionCalidadAire y el nodo puente con las estaciones."@es .
 
 vocab:EstadoEstacion
     rdf:type rdfs:Class ;
@@ -142,9 +142,9 @@ vocab:enLinea
     rdfs:domain vocab:EstadoEstacion ;
     rdfs:range xsd:boolean .
 
-vocab:distanciaACentroideKm
+vocab:distanciaACeldaModeloKm
     rdf:type rdf:Property ;
-    rdfs:label "distancia al centro de la celda (km)"@es ;
-    rdfs:comment "Distancia Haversine entre la estación y el centro de su celda CAMS; mide qué tan representativa es la celda para la estación."@es ;
+    rdfs:label "distancia a la celda modelo (km)"@es ;
+    rdfs:comment "Distancia Haversine entre la estación y el punto central (geo:lat, geo:long) de su CeldaModelo; mide qué tan representativa es la celda para la estación."@es ;
     rdfs:domain vocab:EstacionBicicleta ;
     rdfs:range xsd:decimal .

@@ -113,7 +113,7 @@ def enlazar_estaciones(estaciones: pd.DataFrame, celdas: pd.DataFrame) -> tuple[
             nuevas[id_celda] = {"id_celda": id_celda, "latitud_celda": lat_c, "longitud_celda": lon_c,
                                 "elevacion": None, "puntos_muestreo": 0}
         filas.append({"id_estacion": e.id_estacion, "id_celda": id_celda,
-                      "distancia_centro_km": round(haversine_km(e.latitud, e.longitud, lat_c, lon_c), 4),
+                      "distancia_celda_modelo_km": round(haversine_km(e.latitud, e.longitud, lat_c, lon_c), 4),
                       "celda_con_datos": id_celda in muestreadas})
     todas = pd.concat([celdas, pd.DataFrame(list(nuevas.values()))], ignore_index=True)
     return pd.DataFrame(filas), todas.sort_values("id_celda", ignore_index=True)

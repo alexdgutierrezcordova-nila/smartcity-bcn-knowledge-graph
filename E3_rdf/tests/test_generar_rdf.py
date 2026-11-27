@@ -42,7 +42,7 @@ def test_validar_detecta_rango_incorrecto_y_nodo_sin_describir():
     g = Graph()
     e = m.DATA["estacion_x"]
     g.add((e, RDF.type, m.VOCAB.EstacionBicicleta))
-    g.add((e, m.VOCAB.distanciaACentroideKm, Literal("lejos")))
+    g.add((e, m.VOCAB.distanciaACeldaModeloKm, Literal("lejos")))
     g.add((e, m.VOCAB.contenidaEnCelda, m.DATA["celda_inexistente"]))
     errores = m.validar(g, vocab)
     assert any(x.startswith("rango") for x in errores)

@@ -5,7 +5,7 @@ CityBikes,stations[].name,schema:name,vocab:EstacionBicicleta,xsd:string,PC1–P
 CityBikes,stations[].latitude,geo:lat,vocab:EstacionBicicleta,xsd:decimal,PC3,Ubicación para medir distancia a Plaza Cataluña
 CityBikes,stations[].longitude,geo:long,vocab:EstacionBicicleta,xsd:decimal,PC3,Ubicación para medir distancia a Plaza Cataluña
 CityBikes,latitude + longitude (calculado),vocab:contenidaEnCelda,vocab:EstacionBicicleta,vocab:CeldaModelo,PC6; PC11–PC15,Enlace con la fuente 2: celda CAMS que contiene la estación
-CityBikes,latitude + longitude (calculado),vocab:distanciaACentroideKm,vocab:EstacionBicicleta,xsd:decimal,—,Calidad del enlace: qué tan lejos está la estación del centro de su celda
+CityBikes,latitude + longitude (calculado),vocab:distanciaACeldaModeloKm,vocab:EstacionBicicleta,xsd:decimal,—,Calidad del enlace: qué tan lejos está la estación del centro de su celda
 CityBikes,network.id,vocab:perteneceARed,vocab:EstacionBicicleta,vocab:RedBicicletas,—,Contexto: red Bicing
 CityBikes,network.company[],vocab:operadaPor,vocab:RedBicicletas,schema:Organization,—,Contexto: operadores de la red
 CityBikes,stations[].timestamp,sosa:resultTime,vocab:EstadoEstacion,xsd:dateTime,PC11–PC15,Instante de la lectura; se alinea con la hora CAMS

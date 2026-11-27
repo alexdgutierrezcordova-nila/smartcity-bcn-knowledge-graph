@@ -1,4 +1,4 @@
-id_estacion,id_celda,distancia_centro_km,celda_con_datos
+id_estacion,id_celda,distancia_celda_modelo_km,celda_con_datos
 00028670e3d01438515caba403ffd680,celda_41.45_2.15,5.0504,True
 00341b8b54545c560fdec7d7983f9f5a,celda_41.35_2.15,5.8603,True
 006395fd7434c1f65d20cf0a1b0c94f0,celda_41.35_2.15,3.8713,True
