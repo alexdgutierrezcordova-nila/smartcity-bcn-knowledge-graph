@@ -274,7 +274,7 @@ Primero se demuestra que detecta errores con un grafo defectuoso; luego se valid
 malo = rdflib.Graph()
 e = gen.DATA['estacion_prueba']
 malo.add((e, rdflib.RDF.type, gen.VOCAB.EstacionBicicleta))
-malo.add((e, gen.VOCAB.distanciaACentroideKm, rdflib.Literal('lejos')))
+malo.add((e, gen.VOCAB.distanciaACeldaModeloKm, rdflib.Literal('lejos')))
 malo.add((e, gen.VOCAB.contenidaEnCelda, gen.DATA['celda_que_no_existe']))
 print('Grafo defectuoso ->', *gen.validar(malo, vocab), sep='\\n  ')
 
@@ -336,8 +336,9 @@ el mismo valor, 27.68). La celda `celda_41.45_2.25` no aparece porque no tiene o
 GraphDB 10.8.5 se ejecuta en Docker (`docker run -d --name graphdb-bcn -p 7200:7200 ontotext/graphdb:10.8.5`).
 El script `cargar_graphdb.py` usa la API REST de GraphDB para:
 1. crear el repositorio `bcn-kg` (ruleset RDFS-Plus Optimized);
-2. importar cada archivo en su grafo con nombre: `graph/vocab`, `graph/bicing` y `graph/calidad_aire`;
-3. ejecutar las consultas `sparql/01–03` y `sparql/pc01–pc15` y guardar sus resultados en `E3_rdf/graphdb/`.
+2. importar los tres archivos (vocabulario, Bicing y calidad del aire) en **un solo grafo** `graph/bcn-kg`,
+   para que ambas fuentes queden conectadas;
+3. ejecutar las consultas `sparql/01–03`, `sparql/05` (enlace entre fuentes) y `sparql/pc01–pc15` y guardar sus resultados en `E3_rdf/graphdb/`.
 """),
     code("ver_codigo(cargar_graphdb.importar)"),
     md("""

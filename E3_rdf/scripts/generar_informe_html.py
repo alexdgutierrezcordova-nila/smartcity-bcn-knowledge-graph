@@ -163,6 +163,9 @@ def construir() -> list[tuple]:
     vocab_reuso = pd.read_csv(DIR_MODELO / "vocabularios_reutilizados.csv")
     mapeo = pd.read_csv(DIR_MODELO / "mapeo_campos.csv")
     tripletas_gdb = json.loads((DIR_GRAPHDB / "02_total_tripletas.json").read_text(encoding="utf-8"))[0]
+    enlace_gdb = json.loads((DIR_GRAPHDB / "05_enlace_fuentes.json").read_text(encoding="utf-8"))[0]
+    dominio_cams = "domains=" + (om["url"].split("domains=")[1].split("&")[0] if "domains=" in om["url"]
+                                 else "auto (no se envía, valor por defecto)")
 
     nombres_sucios = [s["name"] for s in estaciones_raw if re.sub(r"\s+", " ", s["name"]).strip() != s["name"]]
     puntos_om = len(om["payload"])
@@ -286,7 +289,39 @@ def construir() -> list[tuple]:
           h3("3.5 De cada campo a cada pregunta"),
           tabla(mapeo[["fuente", "campo_origen", "termino", "preguntas", "uso"]].rename(columns={
               "fuente": "Fuente", "campo_origen": "Campo de origen", "termino": "Término en el grafo",
-              "preguntas": "Preguntas", "uso": "Para qué sirve"}))]
+              "preguntas": "Preguntas", "uso": "Para qué sirve"})),
+          h3("3.6 Correcciones tras la revisión con la docente"),
+          p("En la revisión del modelo la docente hizo observaciones; cada una se comprobó contra los datos y el "
+            "código antes de cambiar algo:"),
+          tabla(pd.DataFrame([
+              ["Todo debe estar en un solo grafo, con URIs comunes, para que los datos se conecten",
+               "Modelo y ambas fuentes se cargan en **un único grafo** (`graph/bcn-kg`) con una sola URI base "
+               "(`data:`); antes eran tres grafos con nombre",
+               f"Consulta de enlace en GraphDB: las **{enlace_gdb['estaciones_en_celda']} de "
+               f"{len(dfs['citybikes_estaciones'])} estaciones** apuntan a una celda descrita por la fuente CAMS; "
+               f"{enlace_gdb['estaciones_con_datos_aire']} tienen datos de aire (las demás están en "
+               "`celda_41.45_2.25`, sin punto de consulta en Open-Meteo)"],
+              ["Las URIs generadas por script podrían no coincidir entre archivos",
+               "Las dos fuentes construyen la URI de la celda con la **misma función** a partir de la misma "
+               "regla de rejilla (`data:celda_<lat>_<lon>`)",
+               "Prueba automática: todas las celdas usadas por Bicing existen en calidad del aire"],
+              ["¿Dónde está el centroide? Usar la misma nomenclatura que el modelo",
+               "`distanciaACentroideKm` pasa a `vocab:distanciaACeldaModeloKm`. El centroide **es** la CeldaModelo: "
+               "sus `geo:lat`/`geo:long` son el punto central de la cuadrícula",
+               "Ningún término del modelo nombra un concepto que no esté en el diagrama"],
+              ["Fuente del modelo atmosférico (CAMS europeo, global o auto): modelarla solo si varía",
+               "No se modela por observación. Queda como un solo dato de procedencia en cada celda: "
+               "«Copernicus CAMS European»",
+               f"La consulta usó {dominio_cams}; la rejilla de 0.1° (~11 km) corresponde a CAMS European "
+               "(CAMS Global es de ~45 km). Es **constante** en las 4 celdas y las "
+               f"{len(obs)} observaciones"],
+              ["Lo que cambia en el tiempo (bicicletas disponibles) debe ser una Observation",
+               "Ya en el modelo v2: `EstadoEstacion` es `sosa:Observation` sobre la estación, que conserva su "
+               "identidad", "Cada estado tiene `sosa:hasFeatureOfInterest` y `sosa:resultTime`"],
+              ["Reutilizar Observation en vez de clases propias aisladas",
+               "Las dos mediciones (inventario y aire) son subclases de `sosa:Observation`",
+               "GraphDB infiere `sosa:Observation` para estados y observaciones de aire"],
+          ], columns=["Observación de la docente", "Qué se hizo", "Evidencia"]))]
 
     # 4. Fase 3
     estacion_ej = enlace[enlace.id_celda == "celda_41.35_2.15"].id_estacion.iloc[0]
@@ -313,9 +348,10 @@ def construir() -> list[tuple]:
           imagen(grafico_nodos(nodos), "Nodos por clase."),
           h3("4.4 Almacenamiento en GraphDB"),
           p(f"Se creó el repositorio `bcn-kg` en GraphDB 10.8.5 con razonamiento RDFS y se cargó cada archivo en "
-            f"su propio grafo con nombre: vocabulario, Bicing y calidad del aire. El repositorio tiene "
+            f"**un único grafo** (`graph/bcn-kg`): vocabulario, Bicing y calidad del aire juntos, para que las "
+            f"estaciones y las celdas queden conectadas. El repositorio tiene "
             f"**{int(tripletas_gdb['tripletas']):,} tripletas** (datos + vocabulario).".replace(",", " ")),
-          imagen(DIR_CAPTURAS / "graphdb_importacion.png", "Los tres grafos cargados en GraphDB."),
+          imagen(DIR_CAPTURAS / "graphdb_importacion.png", "Un solo grafo en GraphDB con el modelo y las dos fuentes."),
           imagen(DIR_CAPTURAS / "graphdb_nodos_por_clase.png",
                  "Nodos por clase en GraphDB. Además de las clases propias aparecen sus superclases "
                  "inferidas (p. ej., sosa:Observation = estados + observaciones de aire)."),
