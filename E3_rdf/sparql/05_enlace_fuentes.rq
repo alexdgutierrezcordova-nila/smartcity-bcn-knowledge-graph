@@ -1,0 +1,22 @@
+# Enlace entre fuentes: estaciones de Bicing conectadas, por su celda, con la fuente de calidad del aire.
+# estaciones_en_celda: la URI de la celda que usa Bicing es la misma que describe la fuente CAMS (esperado: 542).
+# estaciones_con_datos_aire: además esa celda tiene observaciones (esperado: 500; las 42 de celda_41.45_2.25
+# están en una celda sin punto de consulta en Open-Meteo).
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+
+SELECT (COUNT(DISTINCT ?estacion) AS ?estaciones_en_celda)
+       (COUNT(DISTINCT ?conAire) AS ?estaciones_con_datos_aire)
+       (COUNT(DISTINCT ?celda) AS ?celdas)
+WHERE {
+  ?estacion a vocab:EstacionBicicleta ;
+            vocab:contenidaEnCelda ?celda .
+  ?celda a vocab:CeldaModelo ;
+         geo:lat ?lat .
+  OPTIONAL {
+    ?obs a vocab:ObservacionCalidadAire ;
+         sosa:hasFeatureOfInterest ?celda .
+    BIND(?estacion AS ?conAire)
+  }
+}

@@ -23,11 +23,14 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[2]
 REPO = "bcn-kg"
-GRAFOS = {
-    "http://example.org/bcn-kg/graph/vocab": RAIZ / "E3_rdf" / "modelo" / "vocab.ttl",
-    "http://example.org/bcn-kg/graph/bicing": RAIZ / "E3_rdf" / "rdf" / "bicing.ttl",
-    "http://example.org/bcn-kg/graph/calidad_aire": RAIZ / "E3_rdf" / "rdf" / "calidad_aire.ttl",
-}
+# Un solo grafo: modelo y datos de ambas fuentes comparten grafo y namespace,
+# así las estaciones (Bicing) y las celdas (CAMS) quedan conectadas.
+GRAFO = "http://example.org/bcn-kg/graph/bcn-kg"
+ARCHIVOS = [
+    RAIZ / "E3_rdf" / "modelo" / "vocab.ttl",
+    RAIZ / "E3_rdf" / "rdf" / "bicing.ttl",
+    RAIZ / "E3_rdf" / "rdf" / "calidad_aire.ttl",
+]
 DIR_SPARQL = RAIZ / "E3_rdf" / "sparql"
 DIR_RESULTADOS = RAIZ / "E3_rdf" / "graphdb"
 
@@ -72,12 +75,12 @@ def crear_repositorio(base: str) -> None:
 
 
 def importar(base: str) -> None:
-    """Sube cada archivo Turtle a su grafo con nombre (contexto)."""
-    for grafo, ruta in GRAFOS.items():
-        contexto = urllib.parse.quote(f"<{grafo}>")
+    """Sube los archivos Turtle (modelo + ambas fuentes) al mismo grafo."""
+    contexto = urllib.parse.quote(f"<{GRAFO}>")
+    for ruta in ARCHIVOS:
         peticion(f"{base}/repositories/{REPO}/statements?context={contexto}", "POST",
                  ruta.read_bytes(), {"Content-Type": "text/turtle"})
-        print(f"Importado {ruta.relative_to(RAIZ)} -> <{grafo}>")
+        print(f"Importado {ruta.relative_to(RAIZ)} -> <{GRAFO}>")
 
 
 def consultar(base: str, consulta: str) -> list[dict]:
@@ -91,7 +94,7 @@ def consultar(base: str, consulta: str) -> list[dict]:
 def verificar(base: str) -> None:
     """Ejecuta las consultas de verificación y guarda sus resultados en JSON."""
     DIR_RESULTADOS.mkdir(parents=True, exist_ok=True)
-    rutas = sorted(DIR_SPARQL.glob("0[1-3]_*.rq")) + sorted(DIR_SPARQL.glob("pc*.rq"))
+    rutas = sorted(DIR_SPARQL.glob("0[1235]_*.rq")) + sorted(DIR_SPARQL.glob("pc*.rq"))
     for ruta in rutas:
         filas = consultar(base, ruta.read_text(encoding="utf-8"))
         (DIR_RESULTADOS / f"{ruta.stem}.json").write_text(

@@ -111,7 +111,7 @@ uv run --no-project --with rdflib --with pandas --with matplotlib --with python-
 uv run --no-project --with rdflib --with pandas --with matplotlib --with nbformat --with nbclient --with nbconvert --with ipykernel python E3_rdf/scripts/generar_notebook.py
 ```
 
-Almacenamiento en GraphDB (repositorio `bcn-kg`, un grafo con nombre por archivo):
+Almacenamiento en GraphDB (repositorio `bcn-kg`, un solo grafo `graph/bcn-kg` con el modelo y ambas fuentes):
 
 ```bash
 docker run -d --name graphdb-bcn -p 7200:7200 ontotext/graphdb:10.8.5

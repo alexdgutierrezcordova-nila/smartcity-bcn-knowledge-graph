@@ -8,10 +8,13 @@ Workbench: http://localhost:7200
 Arriba a la derecha, seleccionar **bcn-kg**.
 
 ## 1. Verificar los datos cargados
-**Explore → Graphs overview**. Deben aparecer tres grafos:
-- `http://example.org/bcn-kg/graph/vocab` (modelo)
-- `http://example.org/bcn-kg/graph/bicing` (fuente 1)
-- `http://example.org/bcn-kg/graph/calidad_aire` (fuente 2)
+**Explore → Graphs overview**. Debe aparecer **un solo grafo**, `http://example.org/bcn-kg/graph/bcn-kg`,
+con el modelo (vocab) y las dos fuentes (Bicing y calidad del aire) juntos.
+(«The default graph» lo muestra GraphDB siempre: es el grafo por defecto del repositorio.)
+
+Para demostrar que las fuentes están conectadas: **SPARQL** → pegar `E3_rdf/sparql/05_enlace_fuentes.rq`.
+Debe dar 542 estaciones en una celda descrita por la fuente CAMS (misma URI en ambas fuentes) y 500 con datos
+de aire; las 42 restantes están en `celda_41.45_2.25`, que no tuvo punto de consulta en Open-Meteo.
 
 ## 2. Totales de nodos por clase
 **SPARQL** → pegar y presionar **Run**:
