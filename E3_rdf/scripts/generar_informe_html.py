@@ -1,7 +1,7 @@
 """Genera el informe del proyecto (HTML autocontenido y Word) SIN código.
 
 El informe explica el proceso y los resultados de las tres fases:
-fuentes, limpieza, preguntas de competencia, modelo, RDF, GraphDB y respuestas.
+fuentes, limpieza, preguntas de competencia, modelo v3, RDF, GraphDB, integración y respuestas.
 El código queda aparte (scripts/ y el notebook técnico).
 
 Todo el contenido se arma una sola vez como una lista de bloques
@@ -47,7 +47,7 @@ DIR_MODELO = DIR_E3 / "modelo"
 DIR_SPARQL = DIR_E3 / "sparql"
 DIR_GRAPHDB = DIR_E3 / "graphdb"
 DIR_RAW = RAIZ / "datos" / "crudos"
-RUTA_E1 = RAIZ / "E1_correccion" / "E1_base_corregida.md"
+RUTA_E1 = RAIZ / "E1_dominio" / "E1_base_corregida.md"
 HORA_H = "2026-11-12T17:00:00+00:00"
 
 
@@ -68,7 +68,7 @@ def ejemplo(t: str, pie: str = "") -> tuple: return ("pre", t, pie)
 # ---------------------------------------------------------------------------
 # Datos de entrada
 # ---------------------------------------------------------------------------
-def leer_raw() -> tuple[dict, list]:
+def leer_raw() -> tuple[dict, dict]:
     cb = json.loads(next((DIR_RAW / "citybikes").glob("*.json")).read_text(encoding="utf-8"))
     om = json.loads(next((DIR_RAW / "openmeteo").glob("*.json")).read_text(encoding="utf-8"))
     return cb, om
@@ -127,11 +127,13 @@ def grafico_nodos(tabla_nodos: pd.DataFrame) -> Path:
 
 
 def ejemplo_turtle(g: Graph, estacion_id: str, celda: str) -> str:
-    """Turtle de una estación, su estado, su celda y una observación de la hora H."""
+    """Turtle de una estación, su estado, su barrio y distrito, su celda y la medición de NO2 de la hora H."""
     sub = gen.nuevo_grafo()
     e = gen.uri_estacion(estacion_id)
     nodos = [e, gen.uri_celda(celda)]
-    nodos += list(g.subjects(gen.SOSA.hasFeatureOfInterest, e))
+    nodos += list(g.subjects(gen.SCHEMA.observationAbout, e))
+    barrio = next(o for o in g.objects(e, gen.SCHEMA.containedInPlace) if (o, gen.RDF.type, gen.VOCAB.Barrio) in g)
+    nodos += [barrio, g.value(barrio, gen.SCHEMA.containedInPlace)]
     nodos.append(gen.uri_observacion(celda, HORA_H, "NO2"))
     for n in nodos:
         for t in g.triples((n, None, None)):
@@ -151,12 +153,14 @@ def construir() -> list[tuple]:
     pre = preprocesar.ejecutar(guardar=False)
     estado, celdas, obs = dfs["citybikes_estado"], pre["cams_celdas"], pre["cams_observaciones"]
     enlace = pre["enlace_estacion_celda"]
+    barrios, distritos, enlace_barrio = pre["bcn_barrios"], pre["bcn_distritos"], pre["enlace_estacion_barrio"]
+    bcn_raw = sorted((DIR_RAW / "opendata_bcn").glob("opendata_bcn_barris_*.json"))[-1].name
 
-    gb, ga = gen.ejecutar(guardar=False)
+    gb, ga, gz = gen.ejecutar(guardar=False)
     vocab = Graph().parse(gen.RUTA_VOCAB)
     total = gen.nuevo_grafo()
-    total += gb
-    total += ga
+    for g in (gb, ga, gz):
+        total += g
     nodos = gen.nodos_por_clase(total)
     pcs = ejecutar_pc(total + vocab)
     pc_e1 = preguntas_e1()
@@ -164,6 +168,8 @@ def construir() -> list[tuple]:
     mapeo = pd.read_csv(DIR_MODELO / "mapeo_campos.csv")
     tripletas_gdb = json.loads((DIR_GRAPHDB / "02_total_tripletas.json").read_text(encoding="utf-8"))[0]
     enlace_gdb = json.loads((DIR_GRAPHDB / "05_enlace_fuentes.json").read_text(encoding="utf-8"))[0]
+    distritos_gdb = pd.DataFrame(json.loads((DIR_GRAPHDB / "07_resumen_por_distrito.json").read_text(encoding="utf-8")))
+    evidencia = pd.read_csv(DIR_GRAPHDB / "integracion_movilidad_aire.csv")
     dominio_cams = "domains=" + (om["url"].split("domains=")[1].split("&")[0] if "domains=" in om["url"]
                                  else "auto (no se envía, valor por defecto)")
 
@@ -190,12 +196,19 @@ def construir() -> list[tuple]:
           p("Barcelona publica por separado el estado de su red de bicicletas (Bicing) y la contaminación del aire. "
             "Un ciclista que pedalea por una zona con mucho NO₂ o partículas respira más contaminantes, pero no hay "
             "un lugar donde cruzar ambos datos. Este proyecto los integra en un **grafo de conocimiento RDF** que "
-            "responde preguntas como *«¿qué estaciones tienen bicicletas y están en una zona con aire limpio?»*."),
+            "responde preguntas como *«¿qué estaciones tienen bicicletas y están en una zona con aire limpio?»* "
+            "y permite verlas por **barrio y distrito**."),
+          nota("**Cómo se conecta todo (una sola relación para la ubicación, `schema:containedInPlace`):** "
+               "Estación → Barrio → Distrito → Barcelona, y Estación → Celda CAMS ← mediciones de aire. "
+               "El estado de cada estación y cada medición de aire son `schema:Observation` (datos que cambian "
+               "con el tiempo)."),
           tabla(pd.DataFrame([
-              ["Fuentes integradas", "2 APIs abiertas: CityBikes (Bicing) y Open-Meteo (Copernicus CAMS)"],
+              ["Fuentes integradas", "3 fuentes abiertas: CityBikes (Bicing), Open-Meteo (Copernicus CAMS) y "
+                                     "Open Data BCN (barrios y distritos)"],
               ["Estaciones de bicicletas", f"{len(dfs['citybikes_estaciones'])}"],
+              ["Barrios / distritos", f"{len(barrios)} / {len(distritos)}"],
               ["Observaciones de calidad del aire", f"{len(obs)} (NO₂, PM10 y PM2.5, {horas} horas)"],
-              ["Celdas CAMS (nodo puente)", f"{len(celdas)}"],
+              ["Celdas CAMS (nodo puente con el aire)", f"{len(celdas)}"],
               ["Tripletas RDF", f"{len(total):,}".replace(",", " ")],
               ["Preguntas de competencia respondidas con SPARQL", "15 de 15"],
               ["Almacenamiento", "GraphDB 10.8.5, repositorio bcn-kg"],
@@ -230,8 +243,21 @@ def construir() -> list[tuple]:
               ["Campos descartados", "generationtime_ms, utc_offset_seconds, timezone, timezone_abbreviation "
                                      "(metadatos técnicos de la respuesta)"],
           ], columns=["Aspecto", "Detalle"])),
-          p("Ambas respuestas crudas se guardaron sin modificar, junto con su procedencia (URL, fecha de extracción "
-            "y código HTTP), para poder rastrear cada dato hasta su origen.")]
+          h3("2.3 Fuente 3 · Open Data BCN (barrios y distritos)"),
+          p("Se añadió en esta fase para conectar cada estación con su barrio y su distrito, como pidió la docente. "
+            "No cambia las preguntas de competencia; permite agrupar las respuestas por zona de la ciudad."),
+          tabla(pd.DataFrame([
+              ["Origen", "Portal de datos abiertos del Ayuntamiento de Barcelona, conjunto "
+                         "«Unidades administrativas de la ciudad de Barcelona» (20170706-districtes-barris)"],
+              ["Acceso", "API CKAN datastore_search de opendata-ajuntament.barcelona.cat (la descarga directa del "
+                         "CSV respondía 403 a clientes automáticos; la API entrega los mismos registros)"],
+              ["Formato / licencia", "JSON con el contorno de cada zona en WKT (WGS84) · CC BY 4.0"],
+              ["Registros obtenidos", f"{len(barrios)} barrios y {len(distritos)} distritos ({bcn_raw})"],
+              ["Campos elegidos", "codi_barri, nom_barri, codi_districte, nom_districte, geometria_wgs84"],
+              ["Campos descartados", "geometria_etrs89 (misma forma en otra proyección)"],
+          ], columns=["Aspecto", "Detalle"])),
+          p("Las tres respuestas crudas se guardaron sin modificar en `datos/crudos/`, para poder rastrear cada "
+            "dato hasta su origen.")]
 
     # 3. Fase 2
     ts_raw = estaciones_raw[0]["timestamp"]
@@ -254,6 +280,10 @@ def construir() -> list[tuple]:
                preprocesar.celda_de(*peticion)[0], "Ver 3.2"],
               ["Bicicletas que no suman", "mecánicas + eléctricas ≠ disponibles",
                "se conservan y se registran", f"{len(incidencias)} incidencias documentadas"],
+              ["Estación sin barrio (solo coordenadas)", "lat/long de la estación",
+               "barrio cuyo contorno contiene el punto (punto en polígono)",
+               f"{int(enlace_barrio.dentro_del_contorno.sum())} de {len(enlace_barrio)} estaciones ubicadas; "
+               f"{enlace_barrio.id_barrio.nunique()} barrios con estaciones"],
           ], columns=["Problema", "Antes", "Después", "Resultado"]), "Ejemplos reales tomados de los datos."),
           tabla(pd.DataFrame([
               ["CityBikes · estaciones", len(estaciones_raw), len(dfs["citybikes_estaciones"])],
@@ -272,14 +302,18 @@ def construir() -> list[tuple]:
                 [["id_celda", "puntos_muestreo", "Estaciones", "Observaciones"]]
                 .rename(columns={"id_celda": "Celda", "puntos_muestreo": "Puntos consultados"})),
           h3("3.3 Modelo de datos"),
-          nota("**Idea central:** todo dato medido es una observación (`sosa:Observation`) sobre algo. "
-               "El estado de inventario observa una **estación**; la medición de aire observa una **celda CAMS**. "
-               "Como cada estación está **contenida en** una celda, la celda une las dos fuentes."),
-          imagen(DIR_MODELO / "modelo_datos.png", "Modelo de datos v2. El color indica la fuente de cada clase."),
-          p("Frente al modelo tentativo del Entregable 2 se simplificó: se quitó `vocab:tieneEstado` "
-            "(duplicaba `sosa:hasFeatureOfInterest`), el nodo `schema:QuantitativeValue` (432 nodos que repetían el "
-            "valor; la unidad se declara una vez en el contaminante) y `schema:address` en las estaciones "
-            "(la fuente no la trae). Se añadieron enlaces a DBpedia para Barcelona, Bicing y los contaminantes."),
+          nota("**Idea central:** lo que cambia con el tiempo es una `schema:Observation` que dice de qué trata "
+               "con `schema:observationAbout`: el estado de inventario trata de una **estación**; la medición de aire, "
+               "de una **celda CAMS**. Toda ubicación usa **una sola relación**, `schema:containedInPlace`: la estación "
+               "está en un barrio (que está en un distrito, que está en Barcelona) y en una celda CAMS. "
+               "Esa celda es el puente con la calidad del aire."),
+          imagen(DIR_MODELO / "modelo_datos.png", "Modelo de datos v3 (final). El color indica la fuente de cada clase."),
+          p("Evolución del modelo: el tentativo del Entregable 2 (v1) tenía `vocab:tieneEstado` y un nodo "
+            "`schema:QuantitativeValue` por valor; la v2 los quitó. La **v3 (final)** aplica las correcciones de la "
+            "docente: reemplaza las clases de observación propias por `schema:Observation`, elimina las "
+            "subpropiedades propias (se usan directamente las relaciones de schema.org, Dublin Core y SOSA), quita "
+            "`sosa:FeatureOfInterest` de las superclases y añade barrios y distritos. Solo quedan como términos "
+            "propios las clases del dominio y los conteos de bicicletas."),
           h3("3.4 Vocabularios reutilizados"),
           p("Antes de crear un término propio se buscó en schema.org, SOSA (W3C), WGS84, Dublin Core y DBpedia. "
             "Solo se crearon términos `vocab:` cuando no había uno adecuado."),
@@ -290,74 +324,122 @@ def construir() -> list[tuple]:
           tabla(mapeo[["fuente", "campo_origen", "termino", "preguntas", "uso"]].rename(columns={
               "fuente": "Fuente", "campo_origen": "Campo de origen", "termino": "Término en el grafo",
               "preguntas": "Preguntas", "uso": "Para qué sirve"})),
-          h3("3.6 Correcciones tras la revisión con la docente"),
-          p("En la revisión del modelo la docente hizo observaciones; cada una se comprobó contra los datos y el "
-            "código antes de cambiar algo:"),
+          h3("3.6 Correcciones tras las revisiones con la docente"),
+          p("Cada observación se comprobó contra los datos y el código antes de cambiar algo. "
+            "La columna «Evidencia» indica cómo verificarlo en el grafo."),
           tabla(pd.DataFrame([
-              ["Todo debe estar en un solo grafo, con URIs comunes, para que los datos se conecten",
-               "Modelo y ambas fuentes se cargan en **un único grafo** (`graph/bcn-kg`) con una sola URI base "
-               "(`data:`); antes eran tres grafos con nombre",
-               f"Consulta de enlace en GraphDB: las **{enlace_gdb['estaciones_en_celda']} de "
-               f"{len(dfs['citybikes_estaciones'])} estaciones** apuntan a una celda descrita por la fuente CAMS; "
-               f"{enlace_gdb['estaciones_con_datos_aire']} tienen datos de aire (las demás están en "
-               "`celda_41.45_2.25`, sin punto de consulta en Open-Meteo)"],
-              ["Las URIs generadas por script podrían no coincidir entre archivos",
-               "Las dos fuentes construyen la URI de la celda con la **misma función** a partir de la misma "
-               "regla de rejilla (`data:celda_<lat>_<lon>`)",
-               "Prueba automática: todas las celdas usadas por Bicing existen en calidad del aire"],
-              ["¿Dónde está el centroide? Usar la misma nomenclatura que el modelo",
-               "`distanciaACentroideKm` pasa a `vocab:distanciaACeldaModeloKm`. El centroide **es** la CeldaModelo: "
-               "sus `geo:lat`/`geo:long` son el punto central de la cuadrícula",
-               "Ningún término del modelo nombra un concepto que no esté en el diagrama"],
-              ["Fuente del modelo atmosférico (CAMS europeo, global o auto): modelarla solo si varía",
-               "No se modela por observación. Queda como un solo dato de procedencia en cada celda: "
-               "«Copernicus CAMS European»",
-               f"La consulta usó {dominio_cams}; la rejilla de 0.1° (~11 km) corresponde a CAMS European "
-               "(CAMS Global es de ~45 km). Es **constante** en las 4 celdas y las "
-               f"{len(obs)} observaciones"],
-              ["Lo que cambia en el tiempo (bicicletas disponibles) debe ser una Observation",
-               "Ya en el modelo v2: `EstadoEstacion` es `sosa:Observation` sobre la estación, que conserva su "
-               "identidad", "Cada estado tiene `sosa:hasFeatureOfInterest` y `sosa:resultTime`"],
-              ["Reutilizar Observation en vez de clases propias aisladas",
-               "Las dos mediciones (inventario y aire) son subclases de `sosa:Observation`",
-               "GraphDB infiere `sosa:Observation` para estados y observaciones de aire"],
-          ], columns=["Observación de la docente", "Qué se hizo", "Evidencia"]))]
+              ["Retroalimentación E2",
+               "«EstadoEstación debe ser reemplazada por schema:Observation porque son datos dinámicos»",
+               "Los estados de las estaciones **y** las mediciones de aire son `schema:Observation`, con "
+               "`schema:observationAbout` (de qué trata) y `schema:observationDate` (cuándo)",
+               f"{len(estado)} estados + {len(obs)} mediciones = "
+               f"{len(estado) + len(obs)} nodos `schema:Observation` (tabla 4.3)"],
+              ["Revisión del modelo (26/11)",
+               "Todo en un solo grafo, con URIs comunes, para que los datos se conecten",
+               "Modelo y fuentes se cargan en **un único grafo** (`graph/bcn-kg`) con una sola URI base (`data:`)",
+               "Captura de GraphDB con un solo grafo; consulta 05"],
+              ["Revisión del modelo (26/11)", "¿Dónde está el centroide? Usar la misma nomenclatura",
+               "`vocab:distanciaACeldaModeloKm`: el centroide **es** la CeldaModelo; sus `geo:lat`/`geo:long` son "
+               "el centro de la cuadrícula", "Ningún término nombra un concepto que no esté en el diagrama"],
+              ["Revisión del modelo (26/11)", "Fuente del modelo atmosférico: modelarla solo si varía",
+               "No se modela por observación; queda un solo `dcterms:source` por celda: «Copernicus CAMS European»",
+               f"La consulta usó {dominio_cams}; la rejilla de 0.1° es la de CAMS European y es **constante** en "
+               f"las {len(celdas)} celdas y las {len(obs)} mediciones"],
+              ["Revisión del E3 (27/11)",
+               "«Revisar la relación que vincula a cada estación con su celda porque están dos relaciones "
+               "(usar la de schema:containedInPlace)»",
+               "Se eliminó `vocab:contenidaEnCelda`. Era subpropiedad de `schema:containedInPlace` y el razonador "
+               "de GraphDB mostraba ambas. Igual con `perteneceARed`, `operadaPor` y `mideContaminante`: ahora se usan "
+               "directamente `dcterms:isPartOf`, `schema:provider` y `sosa:observedProperty`",
+               "`vocab.ttl` ya no tiene `rdfs:subPropertyOf`; en el grafo visual cada vínculo tiene un solo predicado"],
+              ["Revisión del E3 (27/11)",
+               "«También la relación entre estación y redes de estación (deberían tener instancias)»",
+               "La red es la instancia `data:red_bicing` («Red Bicing (Barcelona)») con sus 3 operadores; cada "
+               "estación apunta a ella con `dcterms:isPartOf`. Todas las instancias tienen `rdfs:label`, que es el "
+               "nombre que muestra GraphDB (antes se veían identificadores)",
+               f"{len(dfs['citybikes_estaciones'])} estaciones → 1 red → 3 operadores (consulta 04)"],
+              ["Revisión del E3 (27/11)",
+               "«Deben tener conectadas las estaciones a barrios y de barrio a algo más general»",
+               "Fuente 3 (Open Data BCN): Estación → Barrio → Distrito → Barcelona (`schema:City`, enlazada a "
+               "DBpedia), todo con `schema:containedInPlace`",
+               f"Consulta 05: **{enlace_gdb['estaciones_en_barrio']} de {enlace_gdb['estaciones']}** estaciones en "
+               f"un barrio; consulta 07 por distrito"],
+              ["Revisión del E3 (27/11)", "¿Por qué la celda es subclase de característica de interés?",
+               "Se quitó `sosa:FeatureOfInterest`: `CeldaModelo` ⊑ `schema:Place` y `EstacionBicicleta` ⊑ "
+               "`schema:CivicStructure`. La observación ya dice de qué trata con `schema:observationAbout`",
+               "Superclases en `vocab.ttl` y en el diagrama"],
+              ["Revisión del E3 (27/11)", "¿Cuántas celdas hay, 2 o 4?",
+               f"Son **{len(celdas)} celdas CAMS** de 0.1°: {len(celdas) - len(sin_obs)} con mediciones y "
+               f"{len(sin_obs)} sin punto consultado. El E2 mostraba 2 por el error corregido en 3.2",
+               "Tabla de 3.2 y consulta 05"],
+              ["Revisión del E3 (27/11)",
+               "Presentar una estructura integrada para visualizar y comprobar las conexiones entre movilidad urbana "
+               "y calidad del aire",
+               "Consulta 06: una fila por estación que recorre las tres fuentes (barrio, distrito, bicicletas, "
+               "celda y contaminantes) y se exporta a CSV desde GraphDB",
+               f"`E3_rdf/graphdb/integracion_movilidad_aire.csv` ({len(evidencia)} filas); sección 4.5"],
+          ], columns=["Cuándo", "Observación de la docente", "Qué se hizo", "Evidencia"]))]
 
     # 4. Fase 3
     estacion_ej = enlace[enlace.id_celda == "celda_41.35_2.15"].id_estacion.iloc[0]
     b += [h2("4. Fase 3 · Datos RDF y GraphDB"),
           h3("4.1 Identificación de entidades (URIs)"),
-          p("Las dos fuentes usan **la misma URI base** `http://example.org/bcn-kg/data/` y **la misma regla** para "
+          p("Las tres fuentes usan **la misma URI base** `http://example.org/bcn-kg/data/` y **la misma regla** para "
             "formar el nombre: se quitan tildes y espacios. Las estaciones usan el identificador de CityBikes y no "
             "el nombre, porque hay nombres de calle repetidos."),
           tabla(pd.DataFrame([
               ["Red", "data:red_bicing"], ["Operador", f"data:{gen.uri_operador('CESPA').split('/')[-1]}"],
               ["Estación", "data:estacion_<id CityBikes>"], ["Estado", "data:estado_<id>_<fecha>"],
               ["Celda (nodo puente)", "data:celda_<lat>_<lon>"], ["Contaminante", "data:contaminante_<código>"],
-              ["Observación", "data:obs_<celda>_<hora>_<código>"], ["Ciudad", "data:Barcelona"],
+              ["Medición de aire", "data:obs_<celda>_<hora>_<código>"], ["Barrio", "data:barrio_<código>"],
+              ["Distrito", "data:distrito_<código>"], ["Ciudad", "data:Barcelona"],
           ], columns=["Entidad", "Patrón de URI"])),
           h3("4.2 Ejemplo de los datos generados"),
-          p("Una estación, su estado, la celda que la contiene y la observación de NO₂ de esa celda a las "
-            "17:00 UTC (formato Turtle):"),
+          p("Una estación, su estado, su barrio y distrito, la celda que la contiene y la medición de NO₂ de esa "
+            "celda a las 17:00 UTC (formato Turtle). Cada nodo lleva un `rdfs:label` legible:"),
           ejemplo(ejemplo_turtle(total, estacion_ej, "celda_41.35_2.15")),
           h3("4.3 Validación y totales"),
           p(f"Primero se probó con 2 filas por fuente y luego con todos los datos. Cada propiedad se valida contra "
-            f"el dominio y rango del modelo: **0 errores**. Se generaron dos archivos: `bicing.ttl` "
-            f"({len(gb):,} tripletas) y `calidad_aire.ttl` ({len(ga):,} tripletas).".replace(",", " ")),
+            f"el dominio y rango del modelo: **0 errores**. Se generó un archivo por fuente: `bicing.ttl` "
+            f"({len(gb):,} tripletas), `calidad_aire.ttl` ({len(ga):,}) y `barrios.ttl` ({len(gz):,}). "
+            f"En GraphDB los tres se cargan en el mismo grafo.".replace(",", " ")),
           tabla(nodos, "Nodos por clase en el grafo generado."),
           imagen(grafico_nodos(nodos), "Nodos por clase."),
           h3("4.4 Almacenamiento en GraphDB"),
           p(f"Se creó el repositorio `bcn-kg` en GraphDB 10.8.5 con razonamiento RDFS y se cargó cada archivo en "
-            f"**un único grafo** (`graph/bcn-kg`): vocabulario, Bicing y calidad del aire juntos, para que las "
-            f"estaciones y las celdas queden conectadas. El repositorio tiene "
+            f"**un único grafo** (`graph/bcn-kg`): vocabulario, Bicing, calidad del aire y barrios juntos, para que "
+            f"estaciones, barrios y celdas queden conectados. El repositorio tiene "
             f"**{int(tripletas_gdb['tripletas']):,} tripletas** (datos + vocabulario).".replace(",", " ")),
-          imagen(DIR_CAPTURAS / "graphdb_importacion.png", "Un solo grafo en GraphDB con el modelo y las dos fuentes."),
+          imagen(DIR_CAPTURAS / "graphdb_importacion.png", "Un solo grafo en GraphDB con el modelo y las tres fuentes."),
           imagen(DIR_CAPTURAS / "graphdb_nodos_por_clase.png",
-                 "Nodos por clase en GraphDB. Además de las clases propias aparecen sus superclases "
-                 "inferidas (p. ej., sosa:Observation = estados + observaciones de aire)."),
-          imagen(DIR_CAPTURAS / "graphdb_grafo.png", "Una estación en el grafo: su red, su estado y su celda CAMS."),
+                 "Nodos por clase en GraphDB (consulta 01). Además de las clases propias aparecen las superclases "
+                 "que infiere GraphDB (p. ej., schema:AdministrativeArea = 73 barrios + 10 distritos)."),
+          imagen(DIR_CAPTURAS / "graphdb_grafo.png",
+                 "Una estación con todas sus conexiones (consulta 04): su estado, la red Bicing y sus operadores, "
+                 "su barrio → distrito → Barcelona y su celda CAMS con las mediciones de NO₂, PM10 y PM2.5."),
+          imagen(DIR_CAPTURAS / "graphdb_jerarquia.png",
+                 "Jerarquía territorial: un distrito con sus barrios y Barcelona como nivel más general."),
           imagen(DIR_CAPTURAS / "graphdb_grafo_enlace.png",
-                 "Celda CAMS expandida: las estaciones de Bicing enlazadas al nodo puente.")]
+                 "Celda CAMS expandida: las estaciones de Bicing enlazadas al nodo puente con la calidad del aire."),
+          h3("4.5 Integración movilidad + calidad del aire"),
+          p(f"La consulta `05_enlace_fuentes.rq` comprueba que las fuentes están conectadas: de "
+            f"**{enlace_gdb['estaciones']} estaciones**, {enlace_gdb['estaciones_en_barrio']} están en un barrio, "
+            f"{enlace_gdb['estaciones_en_celda']} en una celda CAMS y {enlace_gdb['estaciones_con_datos_aire']} "
+            f"tienen datos de aire (las otras {est_sin_obs} están en la celda sin punto consultado)."),
+          p("La consulta `06_integracion_movilidad_aire.rq` recorre las tres fuentes y devuelve una fila por "
+            "estación. Su resultado se exportó desde GraphDB a `E3_rdf/graphdb/integracion_movilidad_aire.csv` "
+            "como **tabla de evidencia**. Primeras filas:"),
+          tabla(evidencia.head(6).rename(columns={
+              "estacion": "Estación", "barrio": "Barrio", "distrito": "Distrito", "bicicletas": "Bicicletas",
+              "anclajes": "Anclajes libres", "celda": "Celda", "no2": "NO₂", "pm10": "PM10", "pm25": "PM2.5"}),
+              "Contaminantes en µg/m³ a la hora H (12/11/2026 17:00 UTC)."),
+          imagen(DIR_CAPTURAS / "graphdb_integracion.png", "La consulta 06 ejecutada en GraphDB."),
+          p("Al subir por la jerarquía Estación → Barrio → Distrito se obtiene el resumen por distrito "
+            "(consulta `07_resumen_por_distrito.rq`):"),
+          tabla(distritos_gdb.rename(columns={
+              "distrito": "Distrito", "barrios_con_estaciones": "Barrios con estaciones", "estaciones": "Estaciones",
+              "bicicletas_disponibles": "Bicicletas disponibles", "no2_medio": "NO₂ medio a la hora H (µg/m³)"})),
+          imagen(DIR_CAPTURAS / "graphdb_distritos.png", "La consulta 07 ejecutada en GraphDB.")]
 
     # 5. Respuestas
     def top(df: pd.DataFrame, n: int = 5) -> pd.DataFrame:
@@ -396,22 +478,27 @@ def construir() -> list[tuple]:
 
     # 6. Conclusiones
     b += [h2("6. Conclusiones y limitaciones"),
-          ul("Las dos fuentes quedaron integradas en un grafo RDF con una URI base común; la celda CAMS es el "
-             "puente que permite responder las preguntas integradas PC11–PC15.",
-             "El modelo reutiliza schema.org, SOSA, WGS84 y Dublin Core, y enlaza con DBpedia; solo los conteos de "
-             "bicicletas y las relaciones del dominio son términos propios.",
+          ul("Las tres fuentes quedaron integradas en un solo grafo RDF con una URI base común; la celda CAMS es el "
+             "puente que permite responder las preguntas integradas PC11–PC15, y los barrios y distritos permiten "
+             "leer los resultados por zona de la ciudad.",
+             "El modelo reutiliza schema.org (incluida `schema:Observation`), SOSA, WGS84 y Dublin Core, y enlaza con "
+             "DBpedia; cada vínculo usa una sola relación y solo los conteos de bicicletas son atributos propios.",
              "Los datos se validan contra el modelo (0 errores) y las 15 preguntas tienen pruebas automáticas.",
              f"**Limitación:** la celda {', '.join(sin_obs)} ({est_sin_obs} estaciones) no tiene observaciones "
              "porque ningún punto consultado cayó en ella; esas estaciones no aparecen en las preguntas integradas.",
              "**Limitación:** hay una sola captura de Bicing; las 48 horas de CAMS incluyen horas de pronóstico "
              "posteriores a la captura.",
-             "**Limitación:** la resolución CAMS (0.1°, unos 11 × 8 km) da un valor por zona, no por calle."),
+             "**Limitación:** la resolución CAMS (0.1°, unos 11 × 8 km) da un valor por zona, no por calle: "
+             "todas las estaciones de una misma celda comparten el mismo valor de aire, aunque estén en barrios "
+             "distintos."),
           h2("Anexo · Dónde está el código"),
           tabla(pd.DataFrame([
               ["Notebook técnico con código y salidas", "E3_rdf/notebooks/E3_generacion_rdf.html"],
               ["Modelo (vocabulario, diagrama, mapeo)", "E3_rdf/modelo/"],
-              ["Datos RDF", "E3_rdf/rdf/bicing.ttl, E3_rdf/rdf/calidad_aire.ttl"],
-              ["Consultas SPARQL (PC1–PC15)", "E3_rdf/sparql/"],
+              ["Datos RDF", "E3_rdf/rdf/bicing.ttl, calidad_aire.ttl, barrios.ttl"],
+              ["Consultas SPARQL (01–07 y PC1–PC15)", "E3_rdf/sparql/"],
+              ["Resultados de GraphDB y tabla de evidencia", "E3_rdf/graphdb/ (integracion_movilidad_aire.csv)"],
+              ["Datos crudos y CSV procesados", "datos/ (ver datos/README.md)"],
               ["Scripts de conversión y carga", "E3_rdf/scripts/"],
               ["Extracción y limpieza (Fase 2)", "E2_extraccion/"],
           ], columns=["Qué", "Dónde"])),

@@ -1,42 +1,91 @@
-# Guía rápida: demostración en GraphDB
+# Guía de la demostración en GraphDB
 
-Requisito: la computadora conectada a la corriente (si entra en reposo, Docker se detiene).
-Si GraphDB no abre: ejecutar `docker start graphdb-bcn` y esperar unos 30 segundos.
-Workbench: http://localhost:7200
+Workbench: http://localhost:7200 · repositorio **bcn-kg** · un solo grafo `http://example.org/bcn-kg/graph/bcn-kg`.
 
-## 0. Seleccionar el repositorio
-Arriba a la derecha, seleccionar **bcn-kg**.
+## Antes de empezar
 
-## 1. Verificar los datos cargados
-**Explore → Graphs overview**. Debe aparecer **un solo grafo**, `http://example.org/bcn-kg/graph/bcn-kg`,
-con el modelo (vocab) y las dos fuentes (Bicing y calidad del aire) juntos.
-(«The default graph» lo muestra GraphDB siempre: es el grafo por defecto del repositorio.)
+- Conectar la computadora a la corriente: si entra en reposo, Docker se detiene.
+- Si GraphDB no abre, ejecutar `docker start graphdb-bcn` y esperar unos 30 segundos.
+- Si el repositorio está vacío o desactualizado, ejecutar `uv run --no-project python E3_rdf/scripts/cargar_graphdb.py`.
+  Este comando importa los datos y deja guardadas todas las consultas.
+- **Recorrido automático:** `uv run --no-project --with playwright python E3_rdf/scripts/capturar_graphdb.py`.
+  - Abre un navegador visible y hace solo los pasos 1 a 7 de abajo.
+  - En cada paso muestra un cartel que explica lo que se ve.
+  - Guarda las capturas del informe en `E3_rdf/informe/capturas/`.
 
-Para demostrar que las fuentes están conectadas: **SPARQL** → pegar `E3_rdf/sparql/05_enlace_fuentes.rq`.
-Debe dar 542 estaciones en una celda descrita por la fuente CAMS (misma URI en ambas fuentes) y 500 con datos
-de aire; las 42 restantes están en `celda_41.45_2.25`, que no tuvo punto de consulta en Open-Meteo.
+Para hacerlo a mano, primero **seleccionar el repositorio**: clic en **bcn-kg** (arriba a la derecha o en la lista).
 
-## 2. Totales de nodos por clase
-**SPARQL** → pegar y presionar **Run**:
+Todas las consultas están guardadas en **SPARQL → icono de carpeta (*Show saved queries*)**. Son `01`–`07` y
+`PC01`–`PC15`; se elige una y se presiona **Run**.
 
-```sparql
-PREFIX data: <http://example.org/bcn-kg/data/>
-SELECT ?clase (COUNT(DISTINCT ?s) AS ?nodos)
-WHERE { ?s a ?clase . FILTER(STRSTARTS(STR(?s), STR(data:))) }
-GROUP BY ?clase ORDER BY DESC(?nodos)
-```
+## Paso 1 · Un solo grafo
+Ir a **Explore → Graphs overview**. Aparece un solo grafo, `graph/bcn-kg`, que contiene:
 
-Si queda en "Rendering results": clic en **Results only** y luego en **Editor and results**.
-Las clases extra (`sosa:Observation` = 974, `sosa:FeatureOfInterest` = 546, `schema:Place` = 5, etc.) son superclases inferidas por el razonamiento RDFS.
+- el modelo (`vocab.ttl`);
+- las tres fuentes: Bicing, calidad del aire, barrios y distritos.
 
-## 3. Ver el grafo
-**Explore → Visual graph** → buscar `celda_41.35_2.15`. Doble clic en un nodo para expandirlo:
-las estaciones (Bicing) se conectan con la celda CAMS (nodo puente).
+«The default graph» no tiene datos cargados: ahí deja GraphDB las tripletas que **infiere** el razonador
+(los axiomas RDFS y, p. ej., `estación a schema:CivicStructure`). Todas las tripletas explícitas (13 874)
+están en `graph/bcn-kg`.
 
-## 4. Preguntas de competencia
-Todas las consultas ya están guardadas en el Workbench: **SPARQL** → icono de carpeta (*Show saved queries*)
-→ elegir `PC01` … `PC15` (o `01`–`05`) → **Run**. Las registra `cargar_graphdb.py`.
+## Paso 2 · Nodos por clase (consulta `01`)
 
-**SPARQL** → pegar el contenido de `E3_rdf/sparql/pc11.rq` (integrada) y ejecutar.
-Devuelve las estaciones con 5 o más bicicletas en celdas con NO₂ ≤ 25 µg/m³ a las 17:00 UTC (183 filas).
-Cada pregunta PC1–PC15 tiene su archivo `pcNN.rq` en la misma carpeta.
+| Clase | Nodos |
+|---|---:|
+| `schema:Observation` (estados de estación + mediciones de aire) | 974 |
+| `vocab:EstacionBicicleta` | 542 |
+| `vocab:Barrio` | 73 |
+| `vocab:Distrito` | 10 |
+| `vocab:CeldaModelo` | 4 |
+| `vocab:Contaminante` | 3 |
+| `schema:Organization` (operadores) | 3 |
+| `vocab:RedBicicletas` | 1 |
+| `schema:City` (Barcelona) | 1 |
+
+Las filas extra que muestra GraphDB son superclases inferidas por el razonamiento RDFS. Por ejemplo,
+`schema:AdministrativeArea` = 83, que son los 73 barrios más los 10 distritos.
+
+## Paso 3 · Una estación con todas sus conexiones (consulta `04`)
+Abrir `04` y, en vez de **Run**, usar el botón **Visual graph** (el icono de los tres círculos). Se ven las cadenas
+completas de la estación:
+
+- Estado (`observationAbout`) → Estación → Barrio → Distrito → Barcelona (`containedInPlace`);
+- Estación → Red Bicing (`isPartOf`) → operadores (`provider`);
+- Estación → Celda CAMS ← mediciones de NO₂, PM10 y PM2.5 (`observationAbout`) → contaminante (`observedProperty`).
+
+## Paso 4 · Jerarquía territorial
+**Explore → Visual graph** → buscar `distrito_06` (Gràcia). Aparecen sus barrios y, hacia arriba, Barcelona.
+Doble clic en un barrio para ver sus estaciones.
+
+## Paso 5 · La celda CAMS, nodo puente
+**Explore → Visual graph** → buscar `celda_41.35_2.15`. Hacia un lado están las estaciones que contiene (Bicing) y
+hacia el otro, las mediciones de aire que tratan de ella (CAMS). Así se conectan movilidad y calidad del aire.
+
+## Paso 6 · Evidencia de la integración (consultas `05` y `06`)
+- **`05`** da 542 · 542 · 542 · 500:
+  - 542 estaciones en total;
+  - 542 en un barrio;
+  - 542 en una celda CAMS;
+  - 500 con datos de aire.
+
+  Las 42 restantes están en `celda_41.45_2.25`, que no tuvo punto de consulta en Open-Meteo.
+- **`06`** devuelve una fila por estación con su barrio, distrito, bicicletas, anclajes y el NO₂, PM10 y PM2.5 de su
+  celda a la hora H (12/11/2026 17:00 UTC). Son 542 filas. También se exporta a
+  `E3_rdf/graphdb/integracion_movilidad_aire.csv`.
+
+## Paso 7 · Resumen por distrito (consulta `07`)
+Muestra 10 filas: estaciones, bicicletas disponibles y NO₂ medio por distrito. Por ejemplo, Eixample tiene 114 estaciones.
+
+## Preguntas de competencia
+`PC01`–`PC15` responden las 15 preguntas del E1; `PC11`–`PC15` son las integradas (Bicing + aire). Por ejemplo,
+`PC11` devuelve 183 estaciones con 5 o más bicicletas en celdas con NO₂ ≤ 25 µg/m³ a la hora H.
+Cada una tiene su archivo `E3_rdf/sparql/pcNN.rq`.
+
+## Si algo falla
+- **"Rendering results" se queda cargando:** clic en **Results only** y luego en **Editor and results**.
+- **Error *Insufficient free Heap Memory*:** el contenedor se creó sin memoria suficiente. Recrearlo así:
+  ```bash
+  docker rm -f graphdb-bcn
+  docker run -d --name graphdb-bcn -p 7200:7200 -e GDB_HEAP_SIZE=1200m ontotext/graphdb:10.8.5
+  uv run --no-project python E3_rdf/scripts/cargar_graphdb.py
+  ```

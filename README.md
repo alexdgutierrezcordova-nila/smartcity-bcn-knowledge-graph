@@ -10,10 +10,26 @@
 
 ## 📌 Descripción del Proyecto
 
-Este repositorio contiene la arquitectura, pipeline ETL, modelo ontológico (RDF / RDFS / OWL / SOSA) y análisis de interoperabilidad para la integración semántica de dos ecosistemas heterogéneos de datos abiertos en la ciudad de **Barcelona, España**:
+Grafo de conocimiento que integra, en **un solo grafo RDF con URIs comunes**, la movilidad urbana y la calidad del
+aire de **Barcelona**. Tres fuentes abiertas:
 
-1. **Movilidad Urbana Sostenible:** Red pública de bicicletas compartidas (Bicing) consumida en tiempo real vía API REST de CityBikes.
-2. **Medio Ambiente y Salud:** Concentraciones horarias de contaminantes atmosféricos ($NO_2$, $PM_{10}$, $PM_{2.5}$) obtenidas del modelo de dispersión regional europeo Copernicus Atmosphere Monitoring Service (**CAMS**) vía API REST de Open-Meteo.
+1. **Movilidad (CityBikes):** las 542 estaciones de la red Bicing y su estado (bicicletas y anclajes libres).
+2. **Calidad del aire (Open-Meteo / Copernicus CAMS):** concentraciones horarias de NO₂, PM10 y PM2.5 por celda
+   de 0.1° (~11 km) del modelo europeo CAMS.
+3. **Territorio (Open Data BCN):** los 73 barrios y 10 distritos oficiales, con sus contornos.
+
+Cómo se conecta todo (todas las ubicaciones usan `schema:containedInPlace`):
+
+```text
+Estado (schema:Observation) ──observationAbout──▶ Estación ──containedInPlace──▶ Barrio ──▶ Distrito ──▶ Barcelona
+                                                     │
+                                              containedInPlace
+                                                     ▼
+Medición NO₂/PM10/PM2.5 (schema:Observation) ──observationAbout──▶ Celda CAMS   ← nodo puente movilidad ↔ aire
+```
+
+> **Para presentar:** abrir `E3_rdf/informe/informe_proyecto.html` (informe sin código, 3 fases) y
+> `E3_rdf/notebooks/E3_generacion_rdf.html` (código con sus salidas). Demo en GraphDB: `E3_rdf/GUIA_GRAPHDB.md`.
 
 ---
 
@@ -21,88 +37,91 @@ Este repositorio contiene la arquitectura, pipeline ETL, modelo ontológico (RDF
 
 ```text
 smartcity-bcn-knowledge-graph/
-├── datos/                       # ÚNICA carpeta de datos del proyecto (ver datos/README.md)
-│   ├── crudos/                  # Respuestas JSON de las APIs, sin modificar
-│   └── procesados/              # Los 8 CSV definitivos que se convierten a RDF
-├── E1_correccion/               # Entregable 1: dominio, fuentes y 15 preguntas de competencia
-├── E2_extraccion/               # Entregable 2: código de extracción y limpieza, modelo tentativo
-│   ├── src/bcn_kg/              # Funciones de extracción, limpieza y enlace
+├── E1_dominio/                  # Entregable 1: dominio, fuentes y 15 preguntas de competencia
+│   ├── E1_base_corregida.md/.docx   # versión corregida
+│   └── E1_entrega_original.docx     # lo que se entregó
+├── E2_extraccion/               # Entregable 2: extracción y limpieza (histórico, sigue funcionando)
+│   ├── src/bcn_kg/              # funciones de extracción, limpieza y enlace
 │   ├── scripts/                 # capturar.py (APIs → datos/crudos) y procesar_datos.py (→ datos/procesados)
-│   ├── modelo/                  # Modelo tentativo del E2 (histórico)
-│   ├── notebooks/               # Notebook HTML entregado en el E2
+│   ├── modelo/                  # modelo tentativo del E2 (reemplazado por E3_rdf/modelo)
+│   ├── notebooks/               # notebook HTML entregado en el E2
 │   └── tests/
-├── E3_rdf/                      # Entregable 3: modelo v2, RDF, GraphDB e informe
-├── Clases/                      # Apuntes de clase
+├── datos/                       # ÚNICA carpeta de datos (ver datos/README.md)
+│   ├── crudos/                  # respuestas de las 3 fuentes, sin modificar
+│   └── procesados/              # los 11 CSV que se convierten a RDF
+├── E3_rdf/                      # Entregable 3 (final): modelo v3, RDF, GraphDB, informe
+├── material_curso/              # apuntes de clase y especificación de los entregables
 └── README.md
 ```
 
 ---
 
-## 🚀 Instrucciones de Reproducción
-
-```bash
-git clone https://github.com/alexdgutierrezcordova-nila/smartcity-bcn-knowledge-graph.git
-cd smartcity-bcn-knowledge-graph/E2_extraccion
-uv sync
-uv run python scripts/capturar.py        # (opcional) nueva captura de las APIs → datos/crudos
-uv run python scripts/procesar_datos.py  # JSON → CSV de CityBikes en datos/procesados
-uv run pytest -v
-```
-
-Los CSV de calidad del aire y el enlace estación–celda los genera `E3_rdf/scripts/preprocesar.py`
-(ver la sección del Entregable 3).
-
----
-
-## 🧩 Entregable 3: Modelo v2, datos RDF y GraphDB (`E3_rdf/`)
-
-> **Para leer primero:** `E3_rdf/informe/informe_proyecto.html` (informe sin código: fuentes, limpieza,
-> preguntas de competencia, modelo, RDF, GraphDB y respuestas). El código y sus salidas están en
-> `E3_rdf/notebooks/E3_generacion_rdf.html`.
-
-`E3_rdf/modelo/` es el **modelo vigente (v2)**. Simplifica el modelo tentativo de `E2_extraccion/modelo/`, que se
-conserva como historial.
+## 🧩 Entregable 3 (`E3_rdf/`)
 
 ```text
 E3_rdf/
-├── modelo/                   # Modelo v2: vocab.ttl, modelo_datos.png/.svg,
-│                             # vocabularios_reutilizados.csv, mapeo_campos.csv
+├── modelo/                   # Modelo v3: vocab.ttl, modelo_datos.png/.svg,
+│                             # vocabularios_reutilizados.csv (justificación), mapeo_campos.csv (CSV → RDF)
 ├── scripts/
-│   ├── preprocesar.py        # Corrige las celdas CAMS y escribe cams_*.csv y enlace en datos/procesados
-│   ├── generar_rdf.py        # CSV -> RDF (Turtle) + validación contra vocab.ttl
-│   ├── generar_diagrama.py   # Dibuja el diagrama del modelo
-│   ├── cargar_graphdb.py     # Crea el repositorio bcn-kg en GraphDB, importa y ejecuta las consultas
-│   ├── generar_notebook.py   # Construye, ejecuta y exporta el notebook técnico a HTML
-│   └── generar_informe_html.py # Informe sin código (HTML + Word)
-├── rdf/                      # bicing.ttl, calidad_aire.ttl, estadisticas.md
-├── sparql/                   # pc01–pc15.rq (preguntas de competencia) y consultas de verificación
-├── graphdb/                  # Resultados de las consultas ejecutadas en GraphDB
-├── notebooks/                # E3_generacion_rdf.ipynb / .html (anexo técnico)
+│   ├── preprocesar.py        # celdas CAMS, enlace estación–celda y estación–barrio (punto en polígono)
+│   ├── generar_rdf.py        # CSV → RDF (Turtle) + validación contra vocab.ttl
+│   ├── generar_diagrama.py   # dibuja el diagrama del modelo
+│   ├── cargar_graphdb.py     # crea el repositorio bcn-kg, importa, ejecuta y guarda las consultas
+│   ├── capturar_graphdb.py   # recorrido guiado y VISIBLE por GraphDB + capturas del informe
+│   ├── generar_notebook.py   # construye, ejecuta y exporta el notebook técnico a HTML
+│   └── generar_informe_html.py # informe sin código (HTML + Word)
+├── rdf/                      # bicing.ttl, calidad_aire.ttl, barrios.ttl, estadisticas.md
+├── sparql/                   # 01–07 (verificación e integración) y pc01–pc15 (preguntas de competencia)
+├── graphdb/                  # resultados obtenidos en GraphDB + integracion_movilidad_aire.csv
+├── notebooks/                # E3_generacion_rdf.ipynb / .html
 ├── informe/                  # informe_proyecto.html, Informe_proyecto.docx y capturas/
-└── tests/                    # pytest: preprocesamiento, RDF y las 15 preguntas
+├── GUIA_GRAPHDB.md           # guion de la demostración
+└── tests/                    # pytest: preprocesamiento, RDF, integración y las 15 preguntas
 ```
 
-Desde la raíz del repositorio:
+**Modelo v3** (correcciones de la docente del 26 y 27/11):
+
+- Lo dinámico (estado de la estación y mediciones de aire) es `schema:Observation`.
+- Una sola relación por vínculo, sin subpropiedades propias: `schema:containedInPlace` (ubicación),
+  `dcterms:isPartOf` (estación → red), `schema:provider` (red → operadores).
+- La red Bicing y los operadores son instancias reales; las estaciones están en barrios y distritos
+  (`vocab:Barrio`, `vocab:Distrito` ⊑ `schema:AdministrativeArea`) dentro de Barcelona (`schema:City`).
+- Todas las instancias tienen `rdfs:label`, para que el Visual graph de GraphDB se lea.
+
+Nodos por clase: 974 `schema:Observation`, 542 `EstacionBicicleta`, 73 `Barrio`, 10 `Distrito`,
+4 `CeldaModelo`, 3 `Contaminante`, 3 `schema:Organization`, 1 `RedBicicletas`, 1 `schema:City`.
+
+---
+
+## 🚀 Reproducción
+
+Desde la raíz del repositorio (requiere [uv](https://docs.astral.sh/uv/)):
 
 ```bash
-uv run --no-project --with rdflib --with pandas --with pytest python -m pytest E3_rdf/tests
+# 1. (opcional) nueva captura de CityBikes y Open-Meteo y su limpieza
+cd E2_extraccion && uv sync && uv run python scripts/capturar.py && uv run python scripts/procesar_datos.py && cd ..
+
+# 2. CSV → RDF, diagrama y tests
 uv run --no-project --with rdflib --with pandas python E3_rdf/scripts/generar_rdf.py
 uv run --no-project --with matplotlib python E3_rdf/scripts/generar_diagrama.py
-uv run --no-project --with rdflib --with pandas --with matplotlib --with python-docx python E3_rdf/scripts/generar_informe_html.py
-uv run --no-project --with rdflib --with pandas --with matplotlib --with nbformat --with nbclient --with nbconvert --with ipykernel python E3_rdf/scripts/generar_notebook.py
-```
+uv run --no-project --with rdflib --with pandas --with pytest python -m pytest E3_rdf/tests
 
-Almacenamiento en GraphDB (repositorio `bcn-kg`, un solo grafo `graph/bcn-kg` con el modelo y ambas fuentes):
-
-```bash
-docker run -d --name graphdb-bcn -p 7200:7200 ontotext/graphdb:10.8.5
+# 3. GraphDB (repositorio bcn-kg, un solo grafo graph/bcn-kg)
+docker run -d --name graphdb-bcn -p 7200:7200 -e GDB_HEAP_SIZE=1200m ontotext/graphdb:10.8.5
 uv run --no-project python E3_rdf/scripts/cargar_graphdb.py
+uv run --no-project --with playwright python E3_rdf/scripts/capturar_graphdb.py   # recorrido visible
+
+# 4. Notebook e informe
+uv run --no-project --with rdflib --with pandas --with matplotlib --with nbformat --with nbclient --with nbconvert --with ipykernel python E3_rdf/scripts/generar_notebook.py
+uv run --no-project --with rdflib --with pandas --with matplotlib --with python-docx python E3_rdf/scripts/generar_informe_html.py
 ```
 
-Workbench en http://localhost:7200. Guía para la demostración: `E3_rdf/GUIA_GRAPHDB.md`.
+`GDB_HEAP_SIZE=1200m` es necesario: con la memoria por defecto, la consulta 07 (agrupa por distrito) falla con
+*Insufficient free Heap Memory*. La primera vez que se usa Playwright: `uv run --no-project --with playwright playwright install chromium`.
 
 ---
 
 ## 📄 Licencia y Atribución
 * Datos de Movilidad: **Open Database License (ODbL)** / **CC BY 4.0** (CityBikes / Bicing BSM).
 * Datos de Calidad del Aire: **CC BY 4.0** (Open-Meteo / Copernicus CAMS).
+* Barrios y distritos: **CC BY 4.0** (Open Data BCN, Ajuntament de Barcelona).
