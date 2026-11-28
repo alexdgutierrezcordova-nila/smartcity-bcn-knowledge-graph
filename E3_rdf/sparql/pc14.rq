@@ -1,18 +1,17 @@
 # PC14 · [Integrada] ¿Qué estaciones están en la celda con el NO2 más alto a la hora H?
 # H = "2026-11-12T17:00:00+00:00"^^xsd:dateTime (última lectura disponible al momento de la captura de Bicing).
-PREFIX vocab: <http://example.org/bcn-kg/vocab#>
 PREFIX schema: <https://schema.org/>
 PREFIX sosa: <http://www.w3.org/ns/sosa/>
-PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
 PREFIX data: <http://example.org/bcn-kg/data/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?celda ?no2 (COUNT(?e) AS ?estaciones) WHERE {
   {
     SELECT ?c ?no2 WHERE {
-      ?o sosa:hasFeatureOfInterest ?c ; vocab:mideContaminante data:contaminante_NO2 ;
-         sosa:resultTime "2026-11-12T17:00:00+00:00"^^xsd:dateTime ; sosa:hasSimpleResult ?no2 .
+      ?o schema:observationAbout ?c ; sosa:observedProperty data:contaminante_NO2 ;
+         schema:observationDate "2026-11-12T17:00:00+00:00"^^xsd:dateTime ; schema:value ?no2 .
     } ORDER BY DESC(?no2) LIMIT 1
   }
-  ?e vocab:contenidaEnCelda ?c .
+  ?e schema:containedInPlace ?c .
   BIND(STRAFTER(STR(?c), STR(data:)) AS ?celda)
 } GROUP BY ?celda ?no2

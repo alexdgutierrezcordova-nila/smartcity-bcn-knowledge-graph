@@ -1,22 +1,34 @@
-# Subgrafo de ejemplo para la captura (GraphDB > SPARQL > CONSTRUCT > "Visual"):
-# una estacion con su red, operadores, estado, celda CAMS y las 3 observaciones de una hora.
-PREFIX vocab: <http://example.org/bcn-kg/vocab#>
-PREFIX sosa:  <http://www.w3.org/ns/sosa/>
+# Grafo visual: una estación con todas sus conexiones (abrir en Visual graph)
+# Grafo visual de UNA estación con todas sus conexiones (abrir el resultado en "Visual graph").
+# Movilidad:   Estado (schema:Observation) → Estación → Red Bicing → Operadores
+# Territorio:  Estación → Barrio → Distrito → Barcelona          (schema:containedInPlace)
+# Aire:        Estación → Celda CAMS ← Mediciones de NO2/PM10/PM2.5 a la hora H (schema:observationAbout)
 PREFIX schema: <https://schema.org/>
-PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 CONSTRUCT {
-  ?e vocab:perteneceARed ?red ; vocab:contenidaEnCelda ?c .
-  ?st sosa:hasFeatureOfInterest ?e .
-  ?red vocab:operadaPor ?op .
-  ?c schema:containedInPlace ?ciudad .
-  ?o sosa:hasFeatureOfInterest ?c ; vocab:mideContaminante ?k .
+  ?estado schema:observationAbout ?e .
+  ?e dcterms:isPartOf ?red ; schema:containedInPlace ?barrio , ?celda .
+  ?red schema:provider ?op .
+  ?barrio schema:containedInPlace ?distrito .
+  ?distrito schema:containedInPlace ?ciudad .
+  ?obs schema:observationAbout ?celda ; sosa:observedProperty ?contaminante .
 }
 WHERE {
-  { SELECT ?e WHERE { ?e a vocab:EstacionBicicleta ; vocab:contenidaEnCelda ?x } ORDER BY ?e LIMIT 1 }
-  ?e vocab:perteneceARed ?red ; vocab:contenidaEnCelda ?c .
-  ?st sosa:hasFeatureOfInterest ?e .
-  ?red vocab:operadaPor ?op .
-  ?c schema:containedInPlace ?ciudad .
-  ?o sosa:hasFeatureOfInterest ?c ; vocab:mideContaminante ?k ;
-     sosa:resultTime "2026-11-12T12:00:00+00:00"^^xsd:dateTime .
+  { SELECT ?e WHERE {
+      ?e a vocab:EstacionBicicleta ; schema:containedInPlace ?c .
+      ?c a vocab:CeldaModelo .
+      FILTER EXISTS { ?o schema:observationAbout ?c }
+    } ORDER BY ?e LIMIT 1 }
+  ?estado schema:observationAbout ?e .
+  ?e dcterms:isPartOf ?red ; schema:containedInPlace ?barrio , ?celda .
+  ?barrio a vocab:Barrio ; schema:containedInPlace ?distrito .
+  ?distrito schema:containedInPlace ?ciudad .
+  ?celda a vocab:CeldaModelo .
+  ?red schema:provider ?op .
+  ?obs schema:observationAbout ?celda ; sosa:observedProperty ?contaminante ;
+       schema:observationDate "2026-11-12T17:00:00+00:00"^^xsd:dateTime .
 }

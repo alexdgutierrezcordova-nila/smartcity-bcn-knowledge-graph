@@ -1,7 +1,8 @@
 [
   {
+    "estaciones": "542",
+    "estaciones_en_barrio": "542",
     "estaciones_en_celda": "542",
-    "estaciones_con_datos_aire": "500",
-    "celdas": "4"
+    "estaciones_con_datos_aire": "500"
   }
 ]

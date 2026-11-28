@@ -1,0 +1,23 @@
+# Resumen por distrito: estaciones, bicicletas y NO2 medio a la hora H
+# Resumen por distrito: cuántas estaciones y bicicletas hay en cada distrito y qué NO2 medio
+# respiran sus estaciones a la hora H (12/11/2026 17:00 UTC).
+# Sube por la jerarquía Estación → Barrio → Distrito y cruza con la celda CAMS de cada estación.
+PREFIX schema: <https://schema.org/>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX data: <http://example.org/bcn-kg/data/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?distrito (COUNT(DISTINCT ?b) AS ?barrios_con_estaciones) (COUNT(DISTINCT ?e) AS ?estaciones)
+       (SUM(?bicicletas) AS ?bicicletas_disponibles) (ROUND(AVG(?no2) * 10) / 10 AS ?no2_medio)
+WHERE {
+  ?e a vocab:EstacionBicicleta ; schema:containedInPlace ?b , ?c .
+  ?b a vocab:Barrio ; schema:containedInPlace ?d .
+  ?d a vocab:Distrito ; schema:name ?distrito .
+  ?c a vocab:CeldaModelo .
+  ?estado schema:observationAbout ?e ; vocab:bicicletasDisponibles ?bicicletas .
+  OPTIONAL { ?o schema:observationAbout ?c ; sosa:observedProperty data:contaminante_NO2 ;
+                schema:observationDate "2026-11-12T17:00:00+00:00"^^xsd:dateTime ; schema:value ?no2 . }
+}
+GROUP BY ?distrito
+ORDER BY DESC(?estaciones)

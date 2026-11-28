@@ -1,0 +1,509 @@
+@prefix data: <http://example.org/bcn-kg/data/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix vocab: <http://example.org/bcn-kg/vocab#> .
+
+data:barrio_01 a vocab:Barrio ;
+    rdfs:label "Barrio el Raval"@es ;
+    schema:containedInPlace data:distrito_01 ;
+    schema:identifier "1" ;
+    schema:name "el Raval" .
+
+data:barrio_02 a vocab:Barrio ;
+    rdfs:label "Barrio el Barri Gòtic"@es ;
+    schema:containedInPlace data:distrito_01 ;
+    schema:identifier "2" ;
+    schema:name "el Barri Gòtic" .
+
+data:barrio_03 a vocab:Barrio ;
+    rdfs:label "Barrio la Barceloneta"@es ;
+    schema:containedInPlace data:distrito_01 ;
+    schema:identifier "3" ;
+    schema:name "la Barceloneta" .
+
+data:barrio_04 a vocab:Barrio ;
+    rdfs:label "Barrio Sant Pere, Santa Caterina i la Ribera"@es ;
+    schema:containedInPlace data:distrito_01 ;
+    schema:identifier "4" ;
+    schema:name "Sant Pere, Santa Caterina i la Ribera" .
+
+data:barrio_05 a vocab:Barrio ;
+    rdfs:label "Barrio el Fort Pienc"@es ;
+    schema:containedInPlace data:distrito_02 ;
+    schema:identifier "5" ;
+    schema:name "el Fort Pienc" .
+
+data:barrio_06 a vocab:Barrio ;
+    rdfs:label "Barrio la Sagrada Família"@es ;
+    schema:containedInPlace data:distrito_02 ;
+    schema:identifier "6" ;
+    schema:name "la Sagrada Família" .
+
+data:barrio_07 a vocab:Barrio ;
+    rdfs:label "Barrio la Dreta de l'Eixample"@es ;
+    schema:containedInPlace data:distrito_02 ;
+    schema:identifier "7" ;
+    schema:name "la Dreta de l'Eixample" .
+
+data:barrio_08 a vocab:Barrio ;
+    rdfs:label "Barrio l'Antiga Esquerra de l'Eixample"@es ;
+    schema:containedInPlace data:distrito_02 ;
+    schema:identifier "8" ;
+    schema:name "l'Antiga Esquerra de l'Eixample" .
+
+data:barrio_09 a vocab:Barrio ;
+    rdfs:label "Barrio la Nova Esquerra de l'Eixample"@es ;
+    schema:containedInPlace data:distrito_02 ;
+    schema:identifier "9" ;
+    schema:name "la Nova Esquerra de l'Eixample" .
+
+data:barrio_10 a vocab:Barrio ;
+    rdfs:label "Barrio Sant Antoni"@es ;
+    schema:containedInPlace data:distrito_02 ;
+    schema:identifier "10" ;
+    schema:name "Sant Antoni" .
+
+data:barrio_11 a vocab:Barrio ;
+    rdfs:label "Barrio el Poble-sec"@es ;
+    schema:containedInPlace data:distrito_03 ;
+    schema:identifier "11" ;
+    schema:name "el Poble-sec" .
+
+data:barrio_12 a vocab:Barrio ;
+    rdfs:label "Barrio la Marina del Prat Vermell"@es ;
+    schema:containedInPlace data:distrito_03 ;
+    schema:identifier "12" ;
+    schema:name "la Marina del Prat Vermell" .
+
+data:barrio_13 a vocab:Barrio ;
+    rdfs:label "Barrio la Marina de Port"@es ;
+    schema:containedInPlace data:distrito_03 ;
+    schema:identifier "13" ;
+    schema:name "la Marina de Port" .
+
+data:barrio_14 a vocab:Barrio ;
+    rdfs:label "Barrio la Font de la Guatlla"@es ;
+    schema:containedInPlace data:distrito_03 ;
+    schema:identifier "14" ;
+    schema:name "la Font de la Guatlla" .
+
+data:barrio_15 a vocab:Barrio ;
+    rdfs:label "Barrio Hostafrancs"@es ;
+    schema:containedInPlace data:distrito_03 ;
+    schema:identifier "15" ;
+    schema:name "Hostafrancs" .
+
+data:barrio_16 a vocab:Barrio ;
+    rdfs:label "Barrio la Bordeta"@es ;
+    schema:containedInPlace data:distrito_03 ;
+    schema:identifier "16" ;
+    schema:name "la Bordeta" .
+
+data:barrio_17 a vocab:Barrio ;
+    rdfs:label "Barrio Sants - Badal"@es ;
+    schema:containedInPlace data:distrito_03 ;
+    schema:identifier "17" ;
+    schema:name "Sants - Badal" .
+
+data:barrio_18 a vocab:Barrio ;
+    rdfs:label "Barrio Sants"@es ;
+    schema:containedInPlace data:distrito_03 ;
+    schema:identifier "18" ;
+    schema:name "Sants" .
+
+data:barrio_19 a vocab:Barrio ;
+    rdfs:label "Barrio les Corts"@es ;
+    schema:containedInPlace data:distrito_04 ;
+    schema:identifier "19" ;
+    schema:name "les Corts" .
+
+data:barrio_20 a vocab:Barrio ;
+    rdfs:label "Barrio la Maternitat i Sant Ramon"@es ;
+    schema:containedInPlace data:distrito_04 ;
+    schema:identifier "20" ;
+    schema:name "la Maternitat i Sant Ramon" .
+
+data:barrio_21 a vocab:Barrio ;
+    rdfs:label "Barrio Pedralbes"@es ;
+    schema:containedInPlace data:distrito_04 ;
+    schema:identifier "21" ;
+    schema:name "Pedralbes" .
+
+data:barrio_22 a vocab:Barrio ;
+    rdfs:label "Barrio Vallvidrera, el Tibidabo i les Planes"@es ;
+    schema:containedInPlace data:distrito_05 ;
+    schema:identifier "22" ;
+    schema:name "Vallvidrera, el Tibidabo i les Planes" .
+
+data:barrio_23 a vocab:Barrio ;
+    rdfs:label "Barrio Sarrià"@es ;
+    schema:containedInPlace data:distrito_05 ;
+    schema:identifier "23" ;
+    schema:name "Sarrià" .
+
+data:barrio_24 a vocab:Barrio ;
+    rdfs:label "Barrio les Tres Torres"@es ;
+    schema:containedInPlace data:distrito_05 ;
+    schema:identifier "24" ;
+    schema:name "les Tres Torres" .
+
+data:barrio_25 a vocab:Barrio ;
+    rdfs:label "Barrio Sant Gervasi - la Bonanova"@es ;
+    schema:containedInPlace data:distrito_05 ;
+    schema:identifier "25" ;
+    schema:name "Sant Gervasi - la Bonanova" .
+
+data:barrio_26 a vocab:Barrio ;
+    rdfs:label "Barrio Sant Gervasi - Galvany"@es ;
+    schema:containedInPlace data:distrito_05 ;
+    schema:identifier "26" ;
+    schema:name "Sant Gervasi - Galvany" .
+
+data:barrio_27 a vocab:Barrio ;
+    rdfs:label "Barrio el Putxet i el Farró"@es ;
+    schema:containedInPlace data:distrito_05 ;
+    schema:identifier "27" ;
+    schema:name "el Putxet i el Farró" .
+
+data:barrio_28 a vocab:Barrio ;
+    rdfs:label "Barrio Vallcarca i els Penitents"@es ;
+    schema:containedInPlace data:distrito_06 ;
+    schema:identifier "28" ;
+    schema:name "Vallcarca i els Penitents" .
+
+data:barrio_29 a vocab:Barrio ;
+    rdfs:label "Barrio el Coll"@es ;
+    schema:containedInPlace data:distrito_06 ;
+    schema:identifier "29" ;
+    schema:name "el Coll" .
+
+data:barrio_30 a vocab:Barrio ;
+    rdfs:label "Barrio la Salut"@es ;
+    schema:containedInPlace data:distrito_06 ;
+    schema:identifier "30" ;
+    schema:name "la Salut" .
+
+data:barrio_31 a vocab:Barrio ;
+    rdfs:label "Barrio la Vila de Gràcia"@es ;
+    schema:containedInPlace data:distrito_06 ;
+    schema:identifier "31" ;
+    schema:name "la Vila de Gràcia" .
+
+data:barrio_32 a vocab:Barrio ;
+    rdfs:label "Barrio el Camp d'en Grassot i Gràcia Nova"@es ;
+    schema:containedInPlace data:distrito_06 ;
+    schema:identifier "32" ;
+    schema:name "el Camp d'en Grassot i Gràcia Nova" .
+
+data:barrio_33 a vocab:Barrio ;
+    rdfs:label "Barrio el Baix Guinardó"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "33" ;
+    schema:name "el Baix Guinardó" .
+
+data:barrio_34 a vocab:Barrio ;
+    rdfs:label "Barrio Can Baró"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "34" ;
+    schema:name "Can Baró" .
+
+data:barrio_35 a vocab:Barrio ;
+    rdfs:label "Barrio el Guinardó"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "35" ;
+    schema:name "el Guinardó" .
+
+data:barrio_36 a vocab:Barrio ;
+    rdfs:label "Barrio la Font d'en Fargues"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "36" ;
+    schema:name "la Font d'en Fargues" .
+
+data:barrio_37 a vocab:Barrio ;
+    rdfs:label "Barrio el Carmel"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "37" ;
+    schema:name "el Carmel" .
+
+data:barrio_38 a vocab:Barrio ;
+    rdfs:label "Barrio la Teixonera"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "38" ;
+    schema:name "la Teixonera" .
+
+data:barrio_39 a vocab:Barrio ;
+    rdfs:label "Barrio Sant Genís dels Agudells"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "39" ;
+    schema:name "Sant Genís dels Agudells" .
+
+data:barrio_40 a vocab:Barrio ;
+    rdfs:label "Barrio Montbau"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "40" ;
+    schema:name "Montbau" .
+
+data:barrio_41 a vocab:Barrio ;
+    rdfs:label "Barrio la Vall d'Hebron"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "41" ;
+    schema:name "la Vall d'Hebron" .
+
+data:barrio_42 a vocab:Barrio ;
+    rdfs:label "Barrio la Clota"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "42" ;
+    schema:name "la Clota" .
+
+data:barrio_43 a vocab:Barrio ;
+    rdfs:label "Barrio Horta"@es ;
+    schema:containedInPlace data:distrito_07 ;
+    schema:identifier "43" ;
+    schema:name "Horta" .
+
+data:barrio_44 a vocab:Barrio ;
+    rdfs:label "Barrio Vilapicina i la Torre Llobeta"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "44" ;
+    schema:name "Vilapicina i la Torre Llobeta" .
+
+data:barrio_45 a vocab:Barrio ;
+    rdfs:label "Barrio Porta"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "45" ;
+    schema:name "Porta" .
+
+data:barrio_46 a vocab:Barrio ;
+    rdfs:label "Barrio el Turó de la Peira"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "46" ;
+    schema:name "el Turó de la Peira" .
+
+data:barrio_47 a vocab:Barrio ;
+    rdfs:label "Barrio Can Peguera"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "47" ;
+    schema:name "Can Peguera" .
+
+data:barrio_48 a vocab:Barrio ;
+    rdfs:label "Barrio la Guineueta"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "48" ;
+    schema:name "la Guineueta" .
+
+data:barrio_49 a vocab:Barrio ;
+    rdfs:label "Barrio Canyelles"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "49" ;
+    schema:name "Canyelles" .
+
+data:barrio_50 a vocab:Barrio ;
+    rdfs:label "Barrio les Roquetes"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "50" ;
+    schema:name "les Roquetes" .
+
+data:barrio_51 a vocab:Barrio ;
+    rdfs:label "Barrio Verdun"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "51" ;
+    schema:name "Verdun" .
+
+data:barrio_52 a vocab:Barrio ;
+    rdfs:label "Barrio la Prosperitat"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "52" ;
+    schema:name "la Prosperitat" .
+
+data:barrio_53 a vocab:Barrio ;
+    rdfs:label "Barrio la Trinitat Nova"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "53" ;
+    schema:name "la Trinitat Nova" .
+
+data:barrio_54 a vocab:Barrio ;
+    rdfs:label "Barrio Torre Baró"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "54" ;
+    schema:name "Torre Baró" .
+
+data:barrio_55 a vocab:Barrio ;
+    rdfs:label "Barrio Ciutat Meridiana"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "55" ;
+    schema:name "Ciutat Meridiana" .
+
+data:barrio_56 a vocab:Barrio ;
+    rdfs:label "Barrio Vallbona"@es ;
+    schema:containedInPlace data:distrito_08 ;
+    schema:identifier "56" ;
+    schema:name "Vallbona" .
+
+data:barrio_57 a vocab:Barrio ;
+    rdfs:label "Barrio la Trinitat Vella"@es ;
+    schema:containedInPlace data:distrito_09 ;
+    schema:identifier "57" ;
+    schema:name "la Trinitat Vella" .
+
+data:barrio_58 a vocab:Barrio ;
+    rdfs:label "Barrio Baró de Viver"@es ;
+    schema:containedInPlace data:distrito_09 ;
+    schema:identifier "58" ;
+    schema:name "Baró de Viver" .
+
+data:barrio_59 a vocab:Barrio ;
+    rdfs:label "Barrio el Bon Pastor"@es ;
+    schema:containedInPlace data:distrito_09 ;
+    schema:identifier "59" ;
+    schema:name "el Bon Pastor" .
+
+data:barrio_60 a vocab:Barrio ;
+    rdfs:label "Barrio Sant Andreu"@es ;
+    schema:containedInPlace data:distrito_09 ;
+    schema:identifier "60" ;
+    schema:name "Sant Andreu" .
+
+data:barrio_61 a vocab:Barrio ;
+    rdfs:label "Barrio la Sagrera"@es ;
+    schema:containedInPlace data:distrito_09 ;
+    schema:identifier "61" ;
+    schema:name "la Sagrera" .
+
+data:barrio_62 a vocab:Barrio ;
+    rdfs:label "Barrio el Congrés i els Indians"@es ;
+    schema:containedInPlace data:distrito_09 ;
+    schema:identifier "62" ;
+    schema:name "el Congrés i els Indians" .
+
+data:barrio_63 a vocab:Barrio ;
+    rdfs:label "Barrio Navas"@es ;
+    schema:containedInPlace data:distrito_09 ;
+    schema:identifier "63" ;
+    schema:name "Navas" .
+
+data:barrio_64 a vocab:Barrio ;
+    rdfs:label "Barrio el Camp de l'Arpa del Clot"@es ;
+    schema:containedInPlace data:distrito_10 ;
+    schema:identifier "64" ;
+    schema:name "el Camp de l'Arpa del Clot" .
+
+data:barrio_65 a vocab:Barrio ;
+    rdfs:label "Barrio el Clot"@es ;
+    schema:containedInPlace data:distrito_10 ;
+    schema:identifier "65" ;
+    schema:name "el Clot" .
+
+data:barrio_66 a vocab:Barrio ;
+    rdfs:label "Barrio el Parc i la Llacuna del Poblenou"@es ;
+    schema:containedInPlace data:distrito_10 ;
+    schema:identifier "66" ;
+    schema:name "el Parc i la Llacuna del Poblenou" .
+
+data:barrio_67 a vocab:Barrio ;
+    rdfs:label "Barrio la Vila Olímpica del Poblenou"@es ;
+    schema:containedInPlace data:distrito_10 ;
+    schema:identifier "67" ;
+    schema:name "la Vila Olímpica del Poblenou" .
+
+data:barrio_68 a vocab:Barrio ;
+    rdfs:label "Barrio el Poblenou"@es ;
+    schema:containedInPlace data:distrito_10 ;
+    schema:identifier "68" ;
+    schema:name "el Poblenou" .
+
+data:barrio_69 a vocab:Barrio ;
+    rdfs:label "Barrio Diagonal Mar i el Front Marítim del Poblenou"@es ;
+    schema:containedInPlace data:distrito_10 ;
+    schema:identifier "69" ;
+    schema:name "Diagonal Mar i el Front Marítim del Poblenou" .
+
+data:barrio_70 a vocab:Barrio ;
+    rdfs:label "Barrio el Besòs i el Maresme"@es ;
+    schema:containedInPlace data:distrito_10 ;
+    schema:identifier "70" ;
+    schema:name "el Besòs i el Maresme" .
+
+data:barrio_71 a vocab:Barrio ;
+    rdfs:label "Barrio Provençals del Poblenou"@es ;
+    schema:containedInPlace data:distrito_10 ;
+    schema:identifier "71" ;
+    schema:name "Provençals del Poblenou" .
+
+data:barrio_72 a vocab:Barrio ;
+    rdfs:label "Barrio Sant Martí de Provençals"@es ;
+    schema:containedInPlace data:distrito_10 ;
+    schema:identifier "72" ;
+    schema:name "Sant Martí de Provençals" .
+
+data:barrio_73 a vocab:Barrio ;
+    rdfs:label "Barrio la Verneda i la Pau"@es ;
+    schema:containedInPlace data:distrito_10 ;
+    schema:identifier "73" ;
+    schema:name "la Verneda i la Pau" .
+
+data:distrito_04 a vocab:Distrito ;
+    rdfs:label "Distrito Les Corts"@es ;
+    schema:containedInPlace data:Barcelona ;
+    schema:identifier "4" ;
+    schema:name "Les Corts" .
+
+data:distrito_01 a vocab:Distrito ;
+    rdfs:label "Distrito Ciutat Vella"@es ;
+    schema:containedInPlace data:Barcelona ;
+    schema:identifier "1" ;
+    schema:name "Ciutat Vella" .
+
+data:distrito_06 a vocab:Distrito ;
+    rdfs:label "Distrito Gràcia"@es ;
+    schema:containedInPlace data:Barcelona ;
+    schema:identifier "6" ;
+    schema:name "Gràcia" .
+
+data:distrito_02 a vocab:Distrito ;
+    rdfs:label "Distrito Eixample"@es ;
+    schema:containedInPlace data:Barcelona ;
+    schema:identifier "2" ;
+    schema:name "Eixample" .
+
+data:distrito_05 a vocab:Distrito ;
+    rdfs:label "Distrito Sarrià-Sant Gervasi"@es ;
+    schema:containedInPlace data:Barcelona ;
+    schema:identifier "5" ;
+    schema:name "Sarrià-Sant Gervasi" .
+
+data:distrito_09 a vocab:Distrito ;
+    rdfs:label "Distrito Sant Andreu"@es ;
+    schema:containedInPlace data:Barcelona ;
+    schema:identifier "9" ;
+    schema:name "Sant Andreu" .
+
+data:distrito_03 a vocab:Distrito ;
+    rdfs:label "Distrito Sants-Montjuïc"@es ;
+    schema:containedInPlace data:Barcelona ;
+    schema:identifier "3" ;
+    schema:name "Sants-Montjuïc" .
+
+data:Barcelona a schema:City ;
+    rdfs:label "Barcelona"@es ;
+    schema:name "Barcelona" ;
+    schema:sameAs dbr:Barcelona .
+
+data:distrito_10 a vocab:Distrito ;
+    rdfs:label "Distrito Sant Martí"@es ;
+    schema:containedInPlace data:Barcelona ;
+    schema:identifier "10" ;
+    schema:name "Sant Martí" .
+
+data:distrito_07 a vocab:Distrito ;
+    rdfs:label "Distrito Horta-Guinardó"@es ;
+    schema:containedInPlace data:Barcelona ;
+    schema:identifier "7" ;
+    schema:name "Horta-Guinardó" .
+
+data:distrito_08 a vocab:Distrito ;
+    rdfs:label "Distrito Nou Barris"@es ;
+    schema:containedInPlace data:Barcelona ;
+    schema:identifier "8" ;
+    schema:name "Nou Barris" .
+

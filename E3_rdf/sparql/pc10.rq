@@ -1,14 +1,12 @@
 # PC10 · ¿Cuál es la razón media PM2.5 / PM10 en cada celda? (> 0.6 sugiere combustión; < 0.4, polvo)
-PREFIX vocab: <http://example.org/bcn-kg/vocab#>
 PREFIX schema: <https://schema.org/>
 PREFIX sosa: <http://www.w3.org/ns/sosa/>
-PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
 PREFIX data: <http://example.org/bcn-kg/data/>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?celda (ROUND(AVG(?pm25 / ?pm10) * 100) / 100 AS ?razon_media) WHERE {
-  ?a sosa:hasFeatureOfInterest ?c ; vocab:mideContaminante data:contaminante_PM2_5 ;
-     sosa:resultTime ?t ; sosa:hasSimpleResult ?pm25 .
-  ?b sosa:hasFeatureOfInterest ?c ; vocab:mideContaminante data:contaminante_PM10 ;
-     sosa:resultTime ?t ; sosa:hasSimpleResult ?pm10 .
+  ?a schema:observationAbout ?c ; sosa:observedProperty data:contaminante_PM2_5 ;
+     schema:observationDate ?t ; schema:value ?pm25 .
+  ?b schema:observationAbout ?c ; sosa:observedProperty data:contaminante_PM10 ;
+     schema:observationDate ?t ; schema:value ?pm10 .
   FILTER(?pm10 > 0) BIND(STRAFTER(STR(?c), STR(data:)) AS ?celda)
 } GROUP BY ?celda ORDER BY DESC(?razon_media)

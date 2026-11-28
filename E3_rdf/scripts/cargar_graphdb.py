@@ -1,8 +1,9 @@
 """Entregable 3 — Almacenamiento de los datos RDF en GraphDB.
 
-Crea el repositorio `bcn-kg`, importa el vocabulario y los dos archivos RDF
-(cada uno en su grafo con nombre) y verifica la carga con las consultas de
-E3_rdf/sparql/ (verificación y preguntas de competencia). Los resultados se guardan en E3_rdf/graphdb/.
+Crea el repositorio `bcn-kg`, importa el vocabulario y los tres archivos RDF
+en UN solo grafo y verifica la carga con las consultas de E3_rdf/sparql/
+(verificación, integración y preguntas de competencia). Los resultados se guardan
+en E3_rdf/graphdb/ (JSON) y la tabla de integración también en CSV.
 
 Requisito: GraphDB en ejecución, por ejemplo con Docker:
     docker run -d --name graphdb-bcn -p 7200:7200 ontotext/graphdb:10.8.5
@@ -14,6 +15,7 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import urllib.error
 import urllib.parse
@@ -23,13 +25,14 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[2]
 REPO = "bcn-kg"
-# Un solo grafo: modelo y datos de ambas fuentes comparten grafo y namespace,
-# así las estaciones (Bicing) y las celdas (CAMS) quedan conectadas.
+# Un solo grafo: modelo y datos de las tres fuentes comparten grafo y namespace,
+# así estaciones (Bicing), barrios (Open Data BCN) y celdas (CAMS) quedan conectados.
 GRAFO = "http://example.org/bcn-kg/graph/bcn-kg"
 ARCHIVOS = [
     RAIZ / "E3_rdf" / "modelo" / "vocab.ttl",
     RAIZ / "E3_rdf" / "rdf" / "bicing.ttl",
     RAIZ / "E3_rdf" / "rdf" / "calidad_aire.ttl",
+    RAIZ / "E3_rdf" / "rdf" / "barrios.ttl",
 ]
 DIR_SPARQL = RAIZ / "E3_rdf" / "sparql"
 DIR_RESULTADOS = RAIZ / "E3_rdf" / "graphdb"
@@ -43,7 +46,7 @@ CONFIG_REPO = f"""
 
 [] a rep:Repository ;
     rep:repositoryID "{REPO}" ;
-    rdfs:label "Smart City Barcelona - Bicing y calidad del aire" ;
+    rdfs:label "Smart City Barcelona - Bicing, barrios y calidad del aire" ;
     rep:repositoryImpl [
         rep:repositoryType "graphdb:SailRepository" ;
         sr:sailImpl [
@@ -75,7 +78,7 @@ def crear_repositorio(base: str) -> None:
 
 
 def importar(base: str) -> None:
-    """Sube los archivos Turtle (modelo + ambas fuentes) al mismo grafo."""
+    """Sube los archivos Turtle (modelo + las tres fuentes) al mismo grafo."""
     contexto = urllib.parse.quote(f"<{GRAFO}>")
     for ruta in ARCHIVOS:
         peticion(f"{base}/repositories/{REPO}/statements?context={contexto}", "POST",
@@ -94,15 +97,27 @@ def consultar(base: str, consulta: str) -> list[dict]:
 def verificar(base: str) -> None:
     """Ejecuta las consultas de verificación y guarda sus resultados en JSON."""
     DIR_RESULTADOS.mkdir(parents=True, exist_ok=True)
-    rutas = sorted(DIR_SPARQL.glob("0[1235]_*.rq")) + sorted(DIR_SPARQL.glob("pc*.rq"))
-    for ruta in rutas:
+    # 04 es un CONSTRUCT para el grafo visual: se abre en el Workbench, no se tabula.
+    rutas = [r for r in sorted(DIR_SPARQL.glob("0*.rq")) if not r.name.startswith("04_")]
+    for ruta in rutas + sorted(DIR_SPARQL.glob("pc*.rq")):
         filas = consultar(base, ruta.read_text(encoding="utf-8"))
         (DIR_RESULTADOS / f"{ruta.stem}.json").write_text(
             json.dumps(filas, ensure_ascii=False, indent=2), encoding="utf-8")
+        if ruta.name.startswith("06_"):
+            exportar_csv(filas, DIR_RESULTADOS / "integracion_movilidad_aire.csv")
         print(f"\n{ruta.name}")
         print(f"  {len(filas)} filas")
         for f in filas[:3]:
             print("  " + " | ".join(f.values()))
+
+
+def exportar_csv(filas: list[dict], ruta: Path) -> None:
+    """Tabla de evidencia: exporta el resultado de la consulta tal cual sale del grafo."""
+    columnas = ["estacion", "barrio", "distrito", "bicicletas", "anclajes", "celda", "no2", "pm10", "pm25"]
+    with ruta.open("w", newline="", encoding="utf-8") as f:
+        escritor = csv.DictWriter(f, fieldnames=columnas)
+        escritor.writeheader()
+        escritor.writerows({c: fila.get(c, "") for c in columnas} for fila in filas)
 
 
 def nombre_consulta(ruta: Path) -> str:
@@ -117,6 +132,11 @@ def nombre_consulta(ruta: Path) -> str:
 def guardar_consultas(base: str) -> None:
     """Registra cada .rq como consulta guardada del Workbench (SPARQL → carpeta de consultas guardadas)."""
     url = f"{base}/rest/sparql/saved-queries"
+    vigentes = {nombre_consulta(r) for r in DIR_SPARQL.glob("*.rq")}
+    for previa in json.loads(peticion(url, cabeceras={"Accept": "application/json"})):
+        # elimina consultas de versiones anteriores del proyecto (nombres «0x · …» o «PCxx · …»)
+        if previa["name"] not in vigentes and previa["name"][:2] in {"01", "02", "03", "04", "05", "06", "07", "PC"}:
+            peticion(f"{url}?name={urllib.parse.quote(previa['name'])}", "DELETE")
     for ruta in sorted(DIR_SPARQL.glob("*.rq")):
         nombre = nombre_consulta(ruta)
         try:  # reemplaza la versión anterior si ya existía

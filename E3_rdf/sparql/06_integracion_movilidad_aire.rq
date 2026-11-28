@@ -1,0 +1,28 @@
+# Integración movilidad + calidad del aire: una fila por estación (tabla de evidencia)
+# Integración movilidad + calidad del aire: UNA fila por estación de Bicing con su barrio, distrito,
+# su estado (bicicletas y anclajes) y el aire de su celda CAMS a la hora H = 12/11/2026 17:00 UTC
+# (hora más cercana a la captura de Bicing, 16:30 UTC).
+# Recorre las tres fuentes en una sola consulta: CityBikes + Open Data BCN + CAMS.
+# Resultado esperado: 542 filas; 500 con datos de aire (las 42 de la celda 41.45, 2.25 no tienen punto CAMS).
+# Se exporta a E3_rdf/graphdb/integracion_movilidad_aire.csv (tabla de evidencia).
+PREFIX schema: <https://schema.org/>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
+PREFIX data: <http://example.org/bcn-kg/data/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?estacion ?barrio ?distrito ?bicicletas ?anclajes ?celda ?no2 ?pm10 ?pm25
+WHERE {
+  ?e a vocab:EstacionBicicleta ; schema:name ?estacion ; schema:containedInPlace ?b , ?c .
+  ?b a vocab:Barrio ; schema:name ?barrio ; schema:containedInPlace ?d .
+  ?d schema:name ?distrito .
+  ?c a vocab:CeldaModelo ; schema:name ?celda .
+  ?estado schema:observationAbout ?e ; vocab:bicicletasDisponibles ?bicicletas ; vocab:anclajesLibres ?anclajes .
+  OPTIONAL { ?o1 schema:observationAbout ?c ; sosa:observedProperty data:contaminante_NO2 ;
+                 schema:observationDate "2026-11-12T17:00:00+00:00"^^xsd:dateTime ; schema:value ?no2 . }
+  OPTIONAL { ?o2 schema:observationAbout ?c ; sosa:observedProperty data:contaminante_PM10 ;
+                 schema:observationDate "2026-11-12T17:00:00+00:00"^^xsd:dateTime ; schema:value ?pm10 . }
+  OPTIONAL { ?o3 schema:observationAbout ?c ; sosa:observedProperty data:contaminante_PM2_5 ;
+                 schema:observationDate "2026-11-12T17:00:00+00:00"^^xsd:dateTime ; schema:value ?pm25 . }
+}
+ORDER BY ?distrito ?barrio ?estacion

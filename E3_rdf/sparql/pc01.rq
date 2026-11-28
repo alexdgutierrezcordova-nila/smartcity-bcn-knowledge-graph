@@ -1,12 +1,10 @@
 # PC1 · ¿Qué estaciones tienen más de 10 bicicletas disponibles en el corte de captura?
-PREFIX vocab: <http://example.org/bcn-kg/vocab#>
 PREFIX schema: <https://schema.org/>
-PREFIX sosa: <http://www.w3.org/ns/sosa/>
-PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
 PREFIX data: <http://example.org/bcn-kg/data/>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?estacion ?nombre ?bicicletas WHERE {
-  ?estado a vocab:EstadoEstacion ; sosa:hasFeatureOfInterest ?e ; vocab:bicicletasDisponibles ?bicicletas .
+  ?estado a schema:Observation ; schema:observationAbout ?e ; vocab:bicicletasDisponibles ?bicicletas .
   ?e schema:name ?nombre . BIND(STRAFTER(STR(?e), STR(data:)) AS ?estacion)
   FILTER(?bicicletas > 10)
 } ORDER BY DESC(?bicicletas) ?nombre

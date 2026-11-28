@@ -1,15 +1,19 @@
 [
   {
+    "clase": "https://schema.org/Observation",
+    "nodos": "974"
+  },
+  {
     "clase": "http://example.org/bcn-kg/vocab#EstacionBicicleta",
     "nodos": "542"
   },
   {
-    "clase": "http://example.org/bcn-kg/vocab#EstadoEstacion",
-    "nodos": "542"
+    "clase": "http://example.org/bcn-kg/vocab#Barrio",
+    "nodos": "73"
   },
   {
-    "clase": "http://example.org/bcn-kg/vocab#ObservacionCalidadAire",
-    "nodos": "432"
+    "clase": "http://example.org/bcn-kg/vocab#Distrito",
+    "nodos": "10"
   },
   {
     "clase": "http://example.org/bcn-kg/vocab#CeldaModelo",
@@ -28,7 +32,7 @@
     "nodos": "1"
   },
   {
-    "clase": "https://schema.org/Place",
+    "clase": "https://schema.org/City",
     "nodos": "1"
   }
 ]

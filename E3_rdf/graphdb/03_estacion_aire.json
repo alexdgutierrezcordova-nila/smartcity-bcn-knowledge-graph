@@ -1,10 +1,5 @@
 [
   {
-    "celda": "http://example.org/bcn-kg/data/celda_41.45_2.15",
-    "estaciones": "193",
-    "no2_medio": "32.05"
-  },
-  {
     "celda": "http://example.org/bcn-kg/data/celda_41.35_2.15",
     "estaciones": "301",
     "no2_medio": "27.68"
@@ -13,5 +8,10 @@
     "celda": "http://example.org/bcn-kg/data/celda_41.35_2.25",
     "estaciones": "6",
     "no2_medio": "17.57"
+  },
+  {
+    "celda": "http://example.org/bcn-kg/data/celda_41.45_2.15",
+    "estaciones": "193",
+    "no2_medio": "32.05"
   }
 ]

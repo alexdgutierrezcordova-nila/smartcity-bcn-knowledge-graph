@@ -1,5 +1,6 @@
 # Total de nodos (instancias) por clase en el repositorio GraphDB
 PREFIX data: <http://example.org/bcn-kg/data/>
+
 SELECT ?clase (COUNT(DISTINCT ?s) AS ?nodos)
 WHERE {
   ?s a ?clase .

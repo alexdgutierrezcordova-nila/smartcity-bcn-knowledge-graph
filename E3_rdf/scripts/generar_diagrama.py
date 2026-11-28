@@ -1,4 +1,4 @@
-"""Dibuja el diagrama del modelo v2 (estilo UML de pizarra) a partir de una
+"""Dibuja el diagrama del modelo v3 (estilo UML de pizarra) a partir de una
 descripción declarativa de clases y relaciones.
 
 Cada caja muestra: la clase, su superclase reutilizada y sus atributos clave.
@@ -24,7 +24,8 @@ DIR_MODELO = Path(__file__).resolve().parents[1] / "modelo"
 COLORES = {
     "bicing": ("#e3edf9", "#2f5f98"),    # Fuente 1: CityBikes (Bicing)
     "cams": ("#e4f3e6", "#2e7d3a"),      # Fuente 2: Open-Meteo (CAMS)
-    "puente": ("#fff1d6", "#b7791f"),    # Nodo puente entre fuentes
+    "barrios": ("#f1e6f7", "#7b3f99"),   # Fuente 3: Open Data BCN (barrios y distritos)
+    "puente": ("#fff1d6", "#b7791f"),    # Nodo puente con la calidad del aire
     "contexto": ("#f1f1f1", "#6b6b6b"),  # Contexto compartido
 }
 
@@ -35,25 +36,28 @@ ANCHO = 0.18
 
 # clave: (columna, fila, color, clase, superclase, atributos)
 CLASES = {
-    "org": (0, "arriba", "bicing", "schema:Organization", "",
+    "org": (0, "arriba", "bicing", "schema:Organization", "operadores: BSM, CESPA, PBSC",
             ["schema:name", "schema:identifier"]),
     "red": (1, "arriba", "bicing", "vocab:RedBicicletas", "⊑ schema:Service",
-            ["schema:name", "schema:url", "schema:sameAs → dbr:Bicing"]),
-    "bcn": (2, "arriba", "contexto", "schema:Place  (Barcelona)", "",
+            ["schema:name  (Bicing)", "schema:url", "schema:sameAs → dbr:Bicing"]),
+    "bcn": (3, "arriba", "contexto", "schema:City  (Barcelona)", "",
             ["schema:name", "schema:sameAs → dbr:Barcelona"]),
-    "est": (1, "medio", "bicing", "vocab:EstacionBicicleta",
-            "⊑ schema:CivicStructure\n⊑ sosa:FeatureOfInterest",
-            ["schema:name, schema:identifier", "geo:lat, geo:long : decimal",
-             "vocab:distanciaACeldaModeloKm"]),
-    "celda": (2, "medio", "puente", "vocab:CeldaModelo",
-              "⊑ schema:Place\n⊑ sosa:FeatureOfInterest",
-              ["schema:identifier", "geo:lat, geo:long : centro", "schema:elevation : decimal"]),
-    "estado": (1, "abajo", "bicing", "vocab:EstadoEstacion", "⊑ sosa:Observation",
-               ["sosa:resultTime : dateTime", "vocab:bicicletasDisponibles : int",
+    "estado": (0, "medio", "bicing", "schema:Observation", "estado de la estación",
+               ["schema:observationDate : dateTime", "vocab:bicicletasDisponibles : int",
                 "vocab:anclajesLibres : int", "vocab:bicicletasMecanicas : int",
                 "vocab:bicicletasElectricas : int", "vocab:enLinea : boolean"]),
-    "obs": (2, "abajo", "cams", "vocab:ObservacionCalidadAire", "⊑ sosa:Observation",
-            ["sosa:resultTime : dateTime", "sosa:hasSimpleResult : decimal"]),
+    "est": (1, "medio", "bicing", "vocab:EstacionBicicleta", "⊑ schema:CivicStructure",
+            ["schema:name, schema:identifier", "geo:lat, geo:long : decimal",
+             "vocab:distanciaACeldaModeloKm"]),
+    "barrio": (2, "medio", "barrios", "vocab:Barrio", "⊑ schema:AdministrativeArea",
+               ["schema:name  (73 barrios)", "schema:identifier"]),
+    "distrito": (3, "medio", "barrios", "vocab:Distrito", "⊑ schema:AdministrativeArea",
+                 ["schema:name  (10 distritos)", "schema:identifier"]),
+    "celda": (1, "abajo", "puente", "vocab:CeldaModelo", "⊑ schema:Place",
+              ["schema:identifier", "geo:lat, geo:long : centro", "schema:elevation : decimal"]),
+    "obs": (2, "abajo", "cams", "schema:Observation", "medición de calidad del aire",
+            ["schema:observationDate : dateTime", "schema:value : decimal (µg/m³)",
+             "dcterms:issued : dateTime"]),
     "cont": (3, "abajo", "cams", "vocab:Contaminante", "⊑ sosa:ObservableProperty",
              ["schema:name  (NO₂, PM10, PM2.5)", "schema:unitText  (µg/m³)",
               "rdfs:seeAlso → DBpedia"]),
@@ -61,14 +65,16 @@ CLASES = {
 
 # (origen, destino, propiedad, es_puente)
 RELACIONES = [
-    ("red", "org", "vocab:operadaPor", False),
+    ("red", "org", "schema:provider", False),
     ("red", "bcn", "schema:areaServed", False),
-    ("est", "red", "vocab:perteneceARed", False),
-    ("celda", "bcn", "schema:containedInPlace", False),
-    ("est", "celda", "vocab:contenidaEnCelda", True),
-    ("estado", "est", "sosa:hasFeatureOfInterest", False),
-    ("obs", "celda", "sosa:hasFeatureOfInterest", False),
-    ("obs", "cont", "vocab:mideContaminante", False),
+    ("est", "red", "dcterms:isPartOf", False),
+    ("estado", "est", "schema:observationAbout", False),
+    ("est", "barrio", "schema:containedInPlace", False),
+    ("barrio", "distrito", "schema:containedInPlace", False),
+    ("distrito", "bcn", "schema:containedInPlace", False),
+    ("est", "celda", "schema:containedInPlace", True),
+    ("obs", "celda", "schema:observationAbout", False),
+    ("obs", "cont", "sosa:observedProperty", False),
 ]
 
 LINEA_TITULO, LINEA_SUPER, LINEA_ATRIB = 0.034, 0.026, 0.027
@@ -128,21 +134,21 @@ def flecha(ax, origen: str, destino: str, propiedad: str, puente: bool) -> None:
 
 
 def leyenda(ax) -> None:
-    x, y = 0.015, 0.40
+    x, y = 0.015, 0.285
     ax.text(x, y, "Fuente de cada clase", fontsize=10.5, weight="bold", va="center")
     items = [("bicing", "Fuente 1 · CityBikes (Bicing)"), ("cams", "Fuente 2 · Open-Meteo (CAMS)"),
-             ("puente", "Nodo puente entre fuentes"), ("contexto", "Contexto compartido")]
+             ("barrios", "Fuente 3 · Open Data BCN (barrios)"), ("puente", "Nodo puente con el aire"),
+             ("contexto", "Contexto compartido")]
     for i, (clave, texto) in enumerate(items):
         fondo, borde_ = COLORES[clave]
-        yy = y - 0.045 * (i + 1)
-        ax.add_patch(FancyBboxPatch((x, yy - 0.012), 0.022, 0.024, boxstyle="round,pad=0.002",
+        yy = y - 0.036 * (i + 1)
+        ax.add_patch(FancyBboxPatch((x, yy - 0.011), 0.02, 0.022, boxstyle="round,pad=0.002",
                                     fc=fondo, ec=borde_, lw=1.5))
-        ax.text(x + 0.03, yy, texto, fontsize=9.5, va="center")
-    yy = y - 0.045 * 5 - 0.01
-    notas = ["⊑  subclase de (vocabulario reutilizado)", "vocab:  término propio del proyecto",
-             "dbr:  recurso de DBpedia (enlace LOD)"]
+        ax.text(x + 0.028, yy, texto, fontsize=9.3, va="center")
+    yy = y - 0.036 * 6 - 0.004
+    notas = ["⊑  subclase de (vocabulario reutilizado)", "vocab:  término propio · dbr: DBpedia"]
     for i, nota in enumerate(notas):
-        ax.text(x, yy - 0.032 * i, nota, fontsize=9, va="center", color="#333")
+        ax.text(x, yy - 0.028 * i, nota, fontsize=8.8, va="center", color="#333")
 
 
 def dibujar() -> None:
@@ -151,10 +157,10 @@ def dibujar() -> None:
     ax.set_ylim(0, 1)
     ax.axis("off")
     fig.patch.set_facecolor("white")
-    ax.text(0.5, 0.975, "Modelo de datos v2 · Movilidad (Bicing) y calidad del aire (CAMS) en Barcelona",
+    ax.text(0.5, 0.975, "Modelo de datos v3 · Movilidad (Bicing), barrios y calidad del aire (CAMS) en Barcelona",
             ha="center", va="center", fontsize=16, weight="bold")
-    ax.text(0.5, 0.94, "Cada estado observa una estación y cada medición de aire observa una celda CAMS; "
-            "la celda une ambas fuentes (Estación → contenidaEnCelda → Celda).",
+    ax.text(0.5, 0.94, "Lo dinámico es schema:Observation. Toda ubicación usa schema:containedInPlace: "
+            "Estación → Barrio → Distrito → Barcelona y Estación → Celda CAMS (puente con el aire).",
             ha="center", va="center", fontsize=11, color="#444")
     for origen, destino, propiedad, puente in RELACIONES:
         flecha(ax, origen, destino, propiedad, puente)

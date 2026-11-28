@@ -1,12 +1,13 @@
 """Entregable 3 — Generación de datos RDF (Smart City Barcelona).
 
-Convierte los CSV limpios del Entregable 2 en RDF (Turtle) siguiendo el
-modelo v2 (E3_rdf/modelo/vocab.ttl y modelo_datos.png).
+Convierte los CSV de datos/procesados en RDF (Turtle) siguiendo el modelo v3
+(E3_rdf/modelo/vocab.ttl y modelo_datos.png).
 
-Salidas en E3_rdf/rdf/:
-    bicing.ttl        Fuente 1: red Bicing, operadores, estaciones y estados.
-    calidad_aire.ttl  Fuente 2: Barcelona, celdas CAMS, contaminantes y observaciones.
-    estadisticas.md   Total de nodos por clase y total de tripletas.
+Salidas en E3_rdf/rdf/ (un archivo por fuente; en GraphDB se cargan en UN solo grafo):
+    bicing.ttl            Fuente 1: red Bicing, operadores, estaciones y estados (schema:Observation).
+    calidad_aire.ttl      Fuente 2: celdas CAMS, contaminantes y mediciones (schema:Observation).
+    barrios.ttl           Fuente 3: barrios y distritos de Barcelona (Open Data BCN).
+    estadisticas.md       Total de nodos por clase y total de tripletas.
 
 Uso:
     uv run --no-project --with rdflib --with pandas python E3_rdf/scripts/generar_rdf.py [--limit N]
@@ -54,7 +55,7 @@ def normalizar(texto: str) -> str:
     """Formatea un texto para usarlo como nombre local de una URI.
 
     Quita tildes y diacríticos, reemplaza espacios y símbolos por '_' y
-    elimina guiones bajos sobrantes. Es la MISMA regla para ambas fuentes.
+    elimina guiones bajos sobrantes. Es la MISMA regla para todas las fuentes.
     Ejemplo: 'Barcelona de Serveis Municipals, S.A. (BSM)'
              -> 'Barcelona_de_Serveis_Municipals_S.A._BSM'
     """
@@ -65,6 +66,12 @@ def normalizar(texto: str) -> str:
 def compactar_fecha(iso: str) -> str:
     """'2026-11-12T16:30:24.89+00:00' -> '20261112T163024' (para URIs)."""
     return re.sub(r"[^0-9T]", "", str(iso))[:15]
+
+
+def legible(iso: str) -> str:
+    """'2026-11-12T17:00:00+00:00' -> '12/11/2026 17:00 UTC' (para etiquetas)."""
+    f = pd.Timestamp(iso)
+    return f.strftime("%d/%m/%Y %H:%M UTC")
 
 
 def uri_red() -> URIRef:
@@ -88,7 +95,7 @@ def uri_estado(id_estacion: str, captura_utc: str) -> URIRef:
 
 
 def uri_celda(id_celda: str) -> URIRef:
-    # El id ya viene como 'celda_41.40_2.20': se usa tal cual en ambas fuentes.
+    # El id ya viene como 'celda_41.35_2.15': se usa tal cual en todas las fuentes.
     return DATA[normalizar(id_celda)]
 
 
@@ -98,6 +105,14 @@ def uri_contaminante(codigo: str) -> URIRef:
 
 def uri_observacion(id_celda: str, hora_utc: str, codigo: str) -> URIRef:
     return DATA[f"obs_{normalizar(id_celda)}_{compactar_fecha(hora_utc)}_{normalizar(codigo)}"]
+
+
+def uri_distrito(id_distrito: int) -> URIRef:
+    return DATA[f"distrito_{int(id_distrito):02d}"]
+
+
+def uri_barrio(id_barrio: int) -> URIRef:
+    return DATA[f"barrio_{int(id_barrio):02d}"]
 
 
 # ---------------------------------------------------------------------------
@@ -123,21 +138,23 @@ def fecha_hora(valor: str) -> Literal:
     return Literal(str(valor), datatype=XSD.dateTime)
 
 
+def etiqueta(g: Graph, nodo: URIRef, texto: str) -> None:
+    """rdfs:label legible: es el nombre que muestra GraphDB en el grafo visual."""
+    g.add((nodo, RDFS.label, Literal(texto, lang="es")))
+
+
 def cargar_csv(limite: int = 0) -> dict[str, pd.DataFrame]:
-    """Lee los CSV de datos/procesados (CityBikes) y el preprocesamiento CAMS. Con `limite` toma solo N filas (prueba)."""
+    """Lee los CSV de datos/procesados (CityBikes) y el preprocesamiento (CAMS y barrios).
+    Con `limite` toma solo N filas (prueba)."""
     nombres = ["citybikes_estaciones", "citybikes_estado", "citybikes_operadores", "procedencia"]
     dfs = {n: pd.read_csv(DIR_PROCESADOS / f"{n}.csv") for n in nombres}
-    # Celdas, observaciones y enlace vienen del preprocesamiento E3 (rejilla CAMS corregida)
-    pre = preprocesar.ejecutar(guardar=False)
-    dfs["openmeteo_celdas"] = pre["cams_celdas"]
-    dfs["openmeteo_observaciones"] = pre["cams_observaciones"]
-    dfs["enlace_estacion_celda"] = pre["enlace_estacion_celda"]
+    dfs.update(preprocesar.ejecutar(guardar=False))
     if limite:
         dfs["citybikes_estaciones"] = dfs["citybikes_estaciones"].head(limite)
         ids = set(dfs["citybikes_estaciones"].id_estacion)
-        for n in ("citybikes_estado", "enlace_estacion_celda"):
+        for n in ("citybikes_estado", "enlace_estacion_celda", "enlace_estacion_barrio"):
             dfs[n] = dfs[n][dfs[n].id_estacion.isin(ids)]
-        dfs["openmeteo_observaciones"] = dfs["openmeteo_observaciones"].head(limite)
+        dfs["cams_observaciones"] = dfs["cams_observaciones"].head(limite)
     return dfs
 
 
@@ -147,21 +164,23 @@ def url_y_fecha(procedencia: pd.DataFrame, fuente: str) -> tuple[str, str]:
     return fila.url, fila.extraido_utc
 
 
-# ---------------------------------------------------------------------------
-# Fuente 1: CityBikes (Bicing)
-# ---------------------------------------------------------------------------
 def agregar_ciudad(g: Graph) -> URIRef:
-    """Barcelona como schema:Place, enlazada a DBpedia. Se declara en ambas fuentes
-    con las mismas tripletas, así cada archivo queda completo por sí solo."""
+    """Barcelona como schema:City, enlazada a DBpedia. Se declara en bicing.ttl y
+    barrios.ttl con las mismas tripletas, así cada archivo queda completo por sí solo."""
     ciudad = uri_ciudad()
-    g.add((ciudad, RDF.type, SCHEMA.Place))
+    g.add((ciudad, RDF.type, SCHEMA.City))
     g.add((ciudad, SCHEMA.name, Literal("Barcelona")))
+    etiqueta(g, ciudad, "Barcelona")
     g.add((ciudad, SCHEMA.sameAs, DBR.Barcelona))
     return ciudad
 
 
+# ---------------------------------------------------------------------------
+# Fuente 1: CityBikes (Bicing)
+# ---------------------------------------------------------------------------
 def generar_bicing(dfs: dict[str, pd.DataFrame]) -> Graph:
-    """Instancia RedBicicletas, Organization, EstacionBicicleta y EstadoEstacion."""
+    """Instancia la red Bicing, sus operadores, las estaciones y el estado de cada
+    estación (schema:Observation sobre la estación)."""
     g = nuevo_grafo()
     url, _ = url_y_fecha(dfs["procedencia"], "citybikes")
 
@@ -169,6 +188,7 @@ def generar_bicing(dfs: dict[str, pd.DataFrame]) -> Graph:
     g.add((red, RDF.type, VOCAB.RedBicicletas))
     g.add((red, SCHEMA.identifier, Literal("bicing")))
     g.add((red, SCHEMA.name, Literal("Bicing")))
+    etiqueta(g, red, "Red Bicing (Barcelona)")
     g.add((red, SCHEMA.areaServed, agregar_ciudad(g)))
     g.add((red, SCHEMA.url, Literal(url, datatype=XSD.anyURI)))
     g.add((red, SCHEMA.sameAs, DBR.Bicing))
@@ -178,21 +198,25 @@ def generar_bicing(dfs: dict[str, pd.DataFrame]) -> Graph:
         g.add((u, RDF.type, SCHEMA.Organization))
         g.add((u, SCHEMA.identifier, Literal(normalizar(op.nombre))))
         g.add((u, SCHEMA.name, Literal(op.nombre)))
-        g.add((red, VOCAB.operadaPor, u))
+        etiqueta(g, u, op.nombre)
+        g.add((red, SCHEMA.provider, u))
 
-    enlace = dfs["enlace_estacion_celda"].set_index("id_estacion")
+    celda = dfs["enlace_estacion_celda"].set_index("id_estacion")
+    barrio = dfs["enlace_estacion_barrio"].set_index("id_estacion")
     for est in dfs["citybikes_estaciones"].itertuples():
         u = uri_estacion(est.id_estacion)
         g.add((u, RDF.type, VOCAB.EstacionBicicleta))
         g.add((u, SCHEMA.identifier, Literal(str(est.uid))))
         g.add((u, SCHEMA.name, Literal(est.nombre_limpio)))
+        etiqueta(g, u, f"Estación {est.nombre_limpio}")
         g.add((u, GEO.lat, decimal(est.latitud)))
         g.add((u, GEO.long, decimal(est.longitud)))
-        g.add((u, VOCAB.perteneceARed, red))
-        if est.id_estacion in enlace.index:
-            fila = enlace.loc[est.id_estacion]
-            # Nodo puente con la Fuente 2: misma URI de celda que en calidad_aire.ttl
-            g.add((u, VOCAB.contenidaEnCelda, uri_celda(fila.id_celda)))
+        g.add((u, DCTERMS.isPartOf, red))
+        if est.id_estacion in barrio.index:  # ubicación administrativa (Fuente 3)
+            g.add((u, SCHEMA.containedInPlace, uri_barrio(barrio.loc[est.id_estacion].id_barrio)))
+        if est.id_estacion in celda.index:   # nodo puente con la calidad del aire (Fuente 2)
+            fila = celda.loc[est.id_estacion]
+            g.add((u, SCHEMA.containedInPlace, uri_celda(fila.id_celda)))
             g.add((u, VOCAB.distanciaACeldaModeloKm, decimal(fila.distancia_celda_modelo_km)))
 
     columnas = {
@@ -201,12 +225,13 @@ def generar_bicing(dfs: dict[str, pd.DataFrame]) -> Graph:
         VOCAB.bicicletasMecanicas: "normal_bikes",
         VOCAB.bicicletasElectricas: "ebikes",
     }
+    nombres = dfs["citybikes_estaciones"].set_index("id_estacion").nombre_limpio
     for s in dfs["citybikes_estado"].itertuples():
         u = uri_estado(s.id_estacion, s.captura_utc)
-        estacion = uri_estacion(s.id_estacion)
-        g.add((u, RDF.type, VOCAB.EstadoEstacion))
-        g.add((u, SOSA.hasFeatureOfInterest, estacion))
-        g.add((u, SOSA.resultTime, fecha_hora(s.captura_utc)))
+        g.add((u, RDF.type, SCHEMA.Observation))
+        etiqueta(g, u, f"Estado de {nombres.get(s.id_estacion, s.id_estacion)} · {legible(s.captura_utc)}")
+        g.add((u, SCHEMA.observationAbout, uri_estacion(s.id_estacion)))
+        g.add((u, SCHEMA.observationDate, fecha_hora(s.captura_utc)))
         for propiedad, columna in columnas.items():
             valor = getattr(s, columna)
             if pd.notna(valor):
@@ -219,31 +244,34 @@ def generar_bicing(dfs: dict[str, pd.DataFrame]) -> Graph:
 # Fuente 2: Open-Meteo (CAMS)
 # ---------------------------------------------------------------------------
 CONTAMINANTES = {  # código -> (nombre, recurso DBpedia relacionado)
-    "NO2": ("Dióxido de nitrógeno", DBR.Nitrogen_dioxide),
+    "NO2": ("Dióxido de nitrógeno (NO₂)", DBR.Nitrogen_dioxide),
     "PM10": ("Material particulado PM10", DBR.Particulates),
     "PM2_5": ("Material particulado PM2.5", DBR.Particulates),
 }
 
 
 def generar_calidad_aire(dfs: dict[str, pd.DataFrame]) -> Graph:
-    """Instancia Place (Barcelona), CeldaModelo, Contaminante y ObservacionCalidadAire."""
+    """Instancia las celdas CAMS, los contaminantes y cada medición horaria
+    (schema:Observation sobre la celda)."""
     g = nuevo_grafo()
     _, extraido = url_y_fecha(dfs["procedencia"], "openmeteo")
-    ciudad = agregar_ciudad(g)
 
-    for c in dfs["openmeteo_celdas"].itertuples():
+    for c in dfs["cams_celdas"].itertuples():
         u = uri_celda(c.id_celda)
+        coords = c.id_celda.removeprefix("celda_").replace("_", ", ")
         g.add((u, RDF.type, VOCAB.CeldaModelo))
         g.add((u, SCHEMA.identifier, Literal(c.id_celda)))
-        g.add((u, SCHEMA.name, Literal(f"Celda CAMS Barcelona {c.id_celda.removeprefix('celda_')}")))
+        g.add((u, SCHEMA.name, Literal(f"Celda CAMS {coords}")))
+        etiqueta(g, u, f"Celda CAMS {coords}")
         g.add((u, GEO.lat, decimal(c.latitud_celda)))
         g.add((u, GEO.long, decimal(c.longitud_celda)))
         if pd.notna(c.elevacion):
             g.add((u, SCHEMA.elevation, decimal(c.elevacion)))
+        # La celda (~11 km) desborda los límites de Barcelona: no se declara contenida en la ciudad.
+        # Se llega a ella desde cada estación (schema:containedInPlace), que es el nodo puente.
         g.add((u, DCTERMS.source, Literal("Copernicus CAMS European (Open-Meteo domains=auto, rejilla 0.1°)")))
-        g.add((u, SCHEMA.containedInPlace, ciudad))
 
-    obs = dfs["openmeteo_observaciones"]
+    obs = dfs["cams_observaciones"]
     unidades = obs.groupby("contaminante").unidad.first()
     for codigo in sorted(obs.contaminante.unique()):
         nombre, recurso = CONTAMINANTES.get(codigo, (codigo, None))
@@ -251,6 +279,7 @@ def generar_calidad_aire(dfs: dict[str, pd.DataFrame]) -> Graph:
         g.add((u, RDF.type, VOCAB.Contaminante))
         g.add((u, SCHEMA.identifier, Literal(codigo)))
         g.add((u, SCHEMA.name, Literal(nombre, lang="es")))
+        etiqueta(g, u, nombre)
         # La unidad es la misma para todas las observaciones de un contaminante.
         g.add((u, SCHEMA.unitText, Literal(unidades[codigo])))
         g.add((u, SCHEMA.unitCode, Literal("GQ")))  # UN/CEFACT: microgramo por metro cúbico
@@ -259,12 +288,39 @@ def generar_calidad_aire(dfs: dict[str, pd.DataFrame]) -> Graph:
 
     for o in obs.dropna(subset=["valor"]).itertuples():
         u = uri_observacion(o.id_celda, o.hora_utc, o.contaminante)
-        g.add((u, RDF.type, VOCAB.ObservacionCalidadAire))
-        g.add((u, SOSA.hasFeatureOfInterest, uri_celda(o.id_celda)))
-        g.add((u, VOCAB.mideContaminante, uri_contaminante(o.contaminante)))
-        g.add((u, SOSA.resultTime, fecha_hora(o.hora_utc)))
-        g.add((u, SOSA.hasSimpleResult, decimal(o.valor)))
+        coords = o.id_celda.removeprefix("celda_").replace("_", ", ")
+        g.add((u, RDF.type, SCHEMA.Observation))
+        etiqueta(g, u, f"{o.contaminante.replace('_', '.')} = {o.valor} µg/m³ · celda {coords} · {legible(o.hora_utc)}")
+        g.add((u, SCHEMA.observationAbout, uri_celda(o.id_celda)))
+        g.add((u, SOSA.observedProperty, uri_contaminante(o.contaminante)))
+        g.add((u, SCHEMA.observationDate, fecha_hora(o.hora_utc)))
+        g.add((u, SCHEMA.value, decimal(o.valor)))
         g.add((u, DCTERMS.issued, fecha_hora(extraido)))
+    return g
+
+
+# ---------------------------------------------------------------------------
+# Fuente 3: Open Data BCN (barrios y distritos)
+# ---------------------------------------------------------------------------
+def generar_barrios(dfs: dict[str, pd.DataFrame]) -> Graph:
+    """Instancia los distritos (contenidos en Barcelona) y los barrios
+    (contenidos en su distrito). Las estaciones apuntan a su barrio en bicing.ttl."""
+    g = nuevo_grafo()
+    ciudad = agregar_ciudad(g)
+    for d in dfs["bcn_distritos"].itertuples():
+        u = uri_distrito(d.id_distrito)
+        g.add((u, RDF.type, VOCAB.Distrito))
+        g.add((u, SCHEMA.identifier, Literal(str(d.id_distrito))))
+        g.add((u, SCHEMA.name, Literal(d.nombre_distrito)))
+        etiqueta(g, u, f"Distrito {d.nombre_distrito}")
+        g.add((u, SCHEMA.containedInPlace, ciudad))
+    for b in dfs["bcn_barrios"].itertuples():
+        u = uri_barrio(b.id_barrio)
+        g.add((u, RDF.type, VOCAB.Barrio))
+        g.add((u, SCHEMA.identifier, Literal(str(b.id_barrio))))
+        g.add((u, SCHEMA.name, Literal(b.nombre_barrio)))
+        etiqueta(g, u, f"Barrio {b.nombre_barrio}")
+        g.add((u, SCHEMA.containedInPlace, uri_distrito(b.id_distrito)))
     return g
 
 
@@ -317,32 +373,34 @@ def nodos_por_clase(grafo: Graph) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # Ejecución
 # ---------------------------------------------------------------------------
-def ejecutar(limite: int = 0, guardar: bool = True) -> tuple[Graph, Graph]:
+def ejecutar(limite: int = 0, guardar: bool = True) -> tuple[Graph, Graph, Graph]:
     dfs = cargar_csv(limite)
     g_bicing = generar_bicing(dfs)
     g_aire = generar_calidad_aire(dfs)
+    g_barrios = generar_barrios(dfs)
     vocab = Graph().parse(RUTA_VOCAB)
-    errores = validar(g_bicing + g_aire, vocab)
+    errores = validar(g_bicing + g_aire + g_barrios, vocab)
     if errores:
         raise ValueError(f"{len(errores)} errores de coherencia, p. ej.: {errores[:5]}")
     if guardar:
         DIR_SALIDA.mkdir(parents=True, exist_ok=True)
         g_bicing.serialize(DIR_SALIDA / "bicing.ttl", format="turtle")
         g_aire.serialize(DIR_SALIDA / "calidad_aire.ttl", format="turtle")
+        g_barrios.serialize(DIR_SALIDA / "barrios.ttl", format="turtle")
         total = nuevo_grafo()
-        total += g_bicing
-        total += g_aire
+        for g in (g_bicing, g_aire, g_barrios):
+            total += g
         tabla = nodos_por_clase(total)
         lineas = ["| Clase | Nodos |", "|---|---:|"]
         lineas += [f"| `{c}` | {n} |" for c, n in tabla.itertuples(index=False)]
         lineas += ["", f"Total de tripletas (datos): {len(total)}"]
         (DIR_SALIDA / "estadisticas.md").write_text("\n".join(lineas) + "\n", encoding="utf-8")
-    return g_bicing, g_aire
+    return g_bicing, g_aire, g_barrios
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--limit", type=int, default=0, help="procesar solo N filas (prueba)")
     args = parser.parse_args()
-    gb, ga = ejecutar(args.limit, guardar=not args.limit)
-    print(f"bicing.ttl: {len(gb)} tripletas | calidad_aire.ttl: {len(ga)} tripletas | 0 errores")
+    gb, ga, gz = ejecutar(args.limit, guardar=not args.limit)
+    print(f"bicing.ttl: {len(gb)} | calidad_aire.ttl: {len(ga)} | barrios.ttl: {len(gz)} tripletas | 0 errores")

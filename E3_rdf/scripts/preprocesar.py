@@ -1,6 +1,7 @@
 """Entregable 3 — Preprocesamiento previo a la generación RDF.
 
-Corrige la identificación de celdas CAMS heredada del Entregable 2.
+1. Corrige la identificación de celdas CAMS heredada del Entregable 2.
+2. Ubica cada estación en su barrio y distrito (Fuente 3: Open Data BCN).
 
 Problema detectado: Open-Meteo devuelve en `latitude`/`longitude` una coordenada
 redondeada (p. ej. 41.4, 2.2) que NO identifica la celda real. En la captura,
@@ -14,14 +15,20 @@ estaciones se asignan a su celda por la misma regla (contención exacta).
 La función verifica que todos los puntos de una misma celda traigan series
 idénticas; si no, falla (la hipótesis de rejilla sería incorrecta).
 
+Barrios y distritos: Open Data BCN publica los 73 barrios con su contorno
+(polígono WGS84) y su distrito. Cada estación se asigna al barrio cuyo polígono
+contiene sus coordenadas (prueba punto-en-polígono, sin librerías externas).
+
 Salidas en datos/procesados/: cams_celdas.csv, cams_observaciones.csv,
-enlace_estacion_celda.csv
+enlace_estacion_celda.csv, bcn_distritos.csv, bcn_barrios.csv,
+enlace_estacion_barrio.csv
 """
 
 from __future__ import annotations
 
 import json
 import math
+import re
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -31,6 +38,7 @@ RAIZ = Path(__file__).resolve().parents[2]
 DIR_RAW_CAMS = RAIZ / "datos" / "crudos" / "openmeteo"
 DIR_PROCESADOS = RAIZ / "datos" / "procesados"
 DIR_SALIDA = DIR_PROCESADOS
+DIR_RAW_BCN = RAIZ / "datos" / "crudos" / "opendata_bcn"
 
 TAMANO_CELDA = 0.1
 CONTAMINANTES = {"nitrogen_dioxide": "NO2", "pm10": "PM10", "pm2_5": "PM2_5"}
@@ -119,6 +127,59 @@ def enlazar_estaciones(estaciones: pd.DataFrame, celdas: pd.DataFrame) -> tuple[
     return pd.DataFrame(filas), todas.sort_values("id_celda", ignore_index=True)
 
 
+# ---------------------------------------------------------------------------
+# Fuente 3: barrios y distritos (Open Data BCN)
+# ---------------------------------------------------------------------------
+def leer_opendata(prefijo: str) -> list[dict]:
+    """Registros de la última descarga de Open Data BCN (API datastore_search)."""
+    ruta = sorted(DIR_RAW_BCN.glob(f"opendata_bcn_{prefijo}_*.json"))[-1]
+    return json.loads(ruta.read_text(encoding="utf-8"))["result"]["records"]
+
+
+def poligonos_wkt(wkt: str) -> list[list[tuple[float, float]]]:
+    """Anillos (lon, lat) de un POLYGON o MULTIPOLYGON en WKT (cada par de paréntesis interior)."""
+    return [[tuple(map(float, par.split())) for par in anillo.split(",")]
+            for anillo in re.findall(r"\(([^()]+)\)", wkt)]
+
+
+def dentro(lon: float, lat: float, anillo: list[tuple[float, float]]) -> bool:
+    """Prueba punto-en-polígono por trazado de rayos."""
+    resultado, j = False, len(anillo) - 1
+    for i in range(len(anillo)):
+        (xi, yi), (xj, yj) = anillo[i], anillo[j]
+        if (yi > lat) != (yj > lat) and lon < (xj - xi) * (lat - yi) / (yj - yi) + xi:
+            resultado = not resultado
+        j = i
+    return resultado
+
+
+def barrios_y_distritos() -> tuple[pd.DataFrame, pd.DataFrame, dict[str, list]]:
+    """Tablas de distritos y barrios, y los polígonos de cada barrio."""
+    distritos = pd.DataFrame([{"id_distrito": int(r["Codi_Districte"]), "nombre_distrito": r["nom_districte"]}
+                              for r in leer_opendata("districtes")]).sort_values("id_distrito", ignore_index=True)
+    registros = leer_opendata("barris")
+    barrios = pd.DataFrame([{"id_barrio": int(r["codi_barri"]), "nombre_barrio": r["nom_barri"],
+                             "id_distrito": int(r["codi_districte"])} for r in registros])
+    poligonos = {int(r["codi_barri"]): poligonos_wkt(r["geometria_wgs84"]) for r in registros}
+    return distritos, barrios.sort_values("id_barrio", ignore_index=True), poligonos
+
+
+def ubicar_en_barrios(estaciones: pd.DataFrame, poligonos: dict[int, list]) -> pd.DataFrame:
+    """Barrio que contiene a cada estación. Si un punto queda justo fuera de todos
+    los contornos (p. ej. en el paseo marítimo), se usa el barrio más cercano."""
+    def mas_cercano(lon: float, lat: float) -> int:
+        return min(poligonos, key=lambda b: min((x - lon) ** 2 + (y - lat) ** 2
+                                               for anillo in poligonos[b] for x, y in anillo))
+    filas = []
+    for e in estaciones.itertuples():
+        barrio = next((b for b, anillos in poligonos.items()
+                       if any(dentro(e.longitud, e.latitud, a) for a in anillos)), None)
+        filas.append({"id_estacion": e.id_estacion,
+                      "id_barrio": barrio if barrio is not None else mas_cercano(e.longitud, e.latitud),
+                      "dentro_del_contorno": barrio is not None})
+    return pd.DataFrame(filas)
+
+
 def ejecutar(guardar: bool = True) -> dict[str, pd.DataFrame]:
     capturas = sorted(DIR_RAW_CAMS.glob("openmeteo_cams_*.json"))
     partes = [desanidar_cams(r) for r in capturas]
@@ -127,8 +188,11 @@ def ejecutar(guardar: bool = True) -> dict[str, pd.DataFrame]:
         ["id_celda", "hora_utc", "contaminante"], keep="last").dropna(subset=["valor"])
     estaciones = pd.read_csv(DIR_PROCESADOS / "citybikes_estaciones.csv")
     enlace, celdas = enlazar_estaciones(estaciones, celdas)
+    distritos, barrios, poligonos = barrios_y_distritos()
     salida = {"cams_celdas": celdas, "cams_observaciones": obs.reset_index(drop=True),
-              "enlace_estacion_celda": enlace}
+              "enlace_estacion_celda": enlace,
+              "bcn_distritos": distritos, "bcn_barrios": barrios,
+              "enlace_estacion_barrio": ubicar_en_barrios(estaciones, poligonos)}
     if guardar:
         DIR_SALIDA.mkdir(parents=True, exist_ok=True)
         for nombre, df in salida.items():
@@ -141,3 +205,6 @@ if __name__ == "__main__":
     print(r["cams_celdas"].to_string(index=False))
     print(r["enlace_estacion_celda"].id_celda.value_counts().to_string())
     print(f"observaciones: {len(r['cams_observaciones'])}")
+    eb = r["enlace_estacion_barrio"]
+    print(f"estaciones ubicadas en barrio: {len(eb)} (fuera de contorno, barrio más cercano: "
+          f"{int((~eb.dentro_del_contorno).sum())}) | barrios con estaciones: {eb.id_barrio.nunique()}")

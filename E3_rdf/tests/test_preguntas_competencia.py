@@ -15,8 +15,8 @@ HORA_H = "2026-11-12T17:00:00+00:00"
 
 @pytest.fixture(scope="module")
 def grafo():
-    gb, ga = m.ejecutar(limite=0, guardar=False)
-    return gb + ga + Graph().parse(m.RUTA_VOCAB)
+    gb, ga, gz = m.ejecutar(limite=0, guardar=False)
+    return gb + ga + gz + Graph().parse(m.RUTA_VOCAB)
 
 
 def consultar(grafo, pc):
@@ -51,3 +51,19 @@ def test_pc14_celda_con_mas_no2_y_sus_estaciones(grafo):
     (fila,) = consultar(grafo, "pc14")
     enlace = pd.read_csv(m.DIR_PROCESADOS / "enlace_estacion_celda.csv")
     assert int(fila.estaciones) == (enlace.id_celda == str(fila.celda)).sum()
+
+
+def test_integracion_movilidad_aire_una_fila_por_estacion(grafo):
+    filas = consultar(grafo, "06_integracion_movilidad_aire")
+    assert len(filas) == 542
+    assert sum(f.no2 is not None for f in filas) == 500
+
+
+def test_enlace_de_las_tres_fuentes(grafo):
+    (fila,) = consultar(grafo, "05_enlace_fuentes")
+    assert [int(x) for x in fila] == [542, 542, 542, 500]
+
+
+def test_resumen_por_distrito_suma_todas_las_estaciones(grafo):
+    filas = consultar(grafo, "07_resumen_por_distrito")
+    assert len(filas) == 10 and sum(int(f.estaciones) for f in filas) == 542

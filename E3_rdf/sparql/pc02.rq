@@ -1,12 +1,10 @@
 # PC2 · ¿Qué estaciones están saturadas (0 anclajes libres) y no admiten devoluciones?
-PREFIX vocab: <http://example.org/bcn-kg/vocab#>
 PREFIX schema: <https://schema.org/>
-PREFIX sosa: <http://www.w3.org/ns/sosa/>
-PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
 PREFIX data: <http://example.org/bcn-kg/data/>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?estacion ?nombre ?bicicletas WHERE {
-  ?estado a vocab:EstadoEstacion ; sosa:hasFeatureOfInterest ?e ;
+  ?estado a schema:Observation ; schema:observationAbout ?e ;
           vocab:anclajesLibres ?anclajes ; vocab:bicicletasDisponibles ?bicicletas .
   FILTER(?anclajes = 0)
   ?e schema:name ?nombre . BIND(STRAFTER(STR(?e), STR(data:)) AS ?estacion)

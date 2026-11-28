@@ -1,12 +1,10 @@
 # PC9 · ¿Cuál fue el mínimo y máximo de NO2 en cada celda durante el periodo capturado?
-PREFIX vocab: <http://example.org/bcn-kg/vocab#>
 PREFIX schema: <https://schema.org/>
 PREFIX sosa: <http://www.w3.org/ns/sosa/>
-PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
 PREFIX data: <http://example.org/bcn-kg/data/>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?celda (MIN(?v) AS ?no2_min) (MAX(?v) AS ?no2_max) (MAX(?v) - MIN(?v) AS ?amplitud) WHERE {
-  ?o a vocab:ObservacionCalidadAire ; sosa:hasFeatureOfInterest ?c ;
-     vocab:mideContaminante data:contaminante_NO2 ; sosa:hasSimpleResult ?v .
+  ?o a schema:Observation ; schema:observationAbout ?c ;
+     sosa:observedProperty data:contaminante_NO2 ; schema:value ?v .
   BIND(STRAFTER(STR(?c), STR(data:)) AS ?celda)
 } GROUP BY ?celda ORDER BY DESC(?amplitud)

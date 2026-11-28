@@ -1,17 +1,17 @@
 # PC13 · [Integrada] ¿Qué estaciones con 3 o más ebikes están en celdas con PM2.5 > 15 µg/m³ a la hora H?
 # H = "2026-11-12T17:00:00+00:00"^^xsd:dateTime.
-PREFIX vocab: <http://example.org/bcn-kg/vocab#>
 PREFIX schema: <https://schema.org/>
 PREFIX sosa: <http://www.w3.org/ns/sosa/>
-PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX vocab: <http://example.org/bcn-kg/vocab#>
 PREFIX data: <http://example.org/bcn-kg/data/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
 SELECT ?estacion ?nombre ?ebikes ?celda ?pm25 WHERE {
-  ?estado sosa:hasFeatureOfInterest ?e ; vocab:bicicletasElectricas ?ebikes .
+  ?estado schema:observationAbout ?e ; vocab:bicicletasElectricas ?ebikes .
   FILTER(?ebikes >= 3)
-  ?e schema:name ?nombre ; vocab:contenidaEnCelda ?c .
-  ?o sosa:hasFeatureOfInterest ?c ; vocab:mideContaminante data:contaminante_PM2_5 ;
-     sosa:resultTime "2026-11-12T17:00:00+00:00"^^xsd:dateTime ; sosa:hasSimpleResult ?pm25 .
+  ?e schema:name ?nombre ; schema:containedInPlace ?c .
+  ?o schema:observationAbout ?c ; sosa:observedProperty data:contaminante_PM2_5 ;
+     schema:observationDate "2026-11-12T17:00:00+00:00"^^xsd:dateTime ; schema:value ?pm25 .
   FILTER(?pm25 > 15)
   BIND(STRAFTER(STR(?e), STR(data:)) AS ?estacion) BIND(STRAFTER(STR(?c), STR(data:)) AS ?celda)
 } ORDER BY DESC(?pm25) DESC(?ebikes) ?nombre

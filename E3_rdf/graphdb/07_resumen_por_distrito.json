@@ -1,0 +1,72 @@
+[
+  {
+    "distrito": "Eixample",
+    "barrios_con_estaciones": "6",
+    "estaciones": "114",
+    "bicicletas_disponibles": "452",
+    "no2_medio": "17.8"
+  },
+  {
+    "distrito": "Sant Martí",
+    "barrios_con_estaciones": "10",
+    "estaciones": "93",
+    "bicicletas_disponibles": "1220",
+    "no2_medio": "18.5"
+  },
+  {
+    "distrito": "Ciutat Vella",
+    "barrios_con_estaciones": "4",
+    "estaciones": "62",
+    "bicicletas_disponibles": "328",
+    "no2_medio": "17.2"
+  },
+  {
+    "distrito": "Sants-Montjuïc",
+    "barrios_con_estaciones": "8",
+    "estaciones": "57",
+    "bicicletas_disponibles": "452",
+    "no2_medio": "17.2"
+  },
+  {
+    "distrito": "Sant Andreu",
+    "barrios_con_estaciones": "7",
+    "estaciones": "48",
+    "bicicletas_disponibles": "447",
+    "no2_medio": "20.5"
+  },
+  {
+    "distrito": "Horta-Guinardó",
+    "barrios_con_estaciones": "8",
+    "estaciones": "40",
+    "bicicletas_disponibles": "70",
+    "no2_medio": "20.5"
+  },
+  {
+    "distrito": "Sarrià-Sant Gervasi",
+    "barrios_con_estaciones": "5",
+    "estaciones": "39",
+    "bicicletas_disponibles": "20",
+    "no2_medio": "18.4"
+  },
+  {
+    "distrito": "Les Corts",
+    "barrios_con_estaciones": "3",
+    "estaciones": "37",
+    "bicicletas_disponibles": "74",
+    "no2_medio": "17.2"
+  },
+  {
+    "distrito": "Nou Barris",
+    "barrios_con_estaciones": "10",
+    "estaciones": "28",
+    "bicicletas_disponibles": "89",
+    "no2_medio": "20.5"
+  },
+  {
+    "distrito": "Gràcia",
+    "barrios_con_estaciones": "4",
+    "estaciones": "24",
+    "bicicletas_disponibles": "31",
+    "no2_medio": "20.1"
+  }
+]

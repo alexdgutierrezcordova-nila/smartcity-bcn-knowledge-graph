@@ -1,22 +1,21 @@
-# Enlace entre fuentes: estaciones de Bicing conectadas, por su celda, con la fuente de calidad del aire.
-# estaciones_en_celda: la URI de la celda que usa Bicing es la misma que describe la fuente CAMS (esperado: 542).
-# estaciones_con_datos_aire: además esa celda tiene observaciones (esperado: 500; las 42 de celda_41.45_2.25
-# están en una celda sin punto de consulta en Open-Meteo).
+# Enlace de las tres fuentes: estaciones en barrio, en celda CAMS y con datos de aire
+# Enlace entre las tres fuentes: ¿cuántas estaciones de Bicing (Fuente 1) quedan conectadas
+# con un barrio (Fuente 3) y con una celda CAMS (Fuente 2)? Lo hacen porque usan las MISMAS URIs.
+#   estaciones_en_barrio      esperado 542 (todas caen dentro del contorno de un barrio)
+#   estaciones_en_celda       esperado 542
+#   estaciones_con_datos_aire esperado 500 (las 42 de la celda 41.45, 2.25 no tienen punto CAMS consultado)
+PREFIX schema: <https://schema.org/>
 PREFIX vocab: <http://example.org/bcn-kg/vocab#>
-PREFIX sosa: <http://www.w3.org/ns/sosa/>
-PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
 
-SELECT (COUNT(DISTINCT ?estacion) AS ?estaciones_en_celda)
+SELECT (COUNT(DISTINCT ?estacion) AS ?estaciones)
+       (COUNT(DISTINCT ?enBarrio) AS ?estaciones_en_barrio)
+       (COUNT(DISTINCT ?enCelda) AS ?estaciones_en_celda)
        (COUNT(DISTINCT ?conAire) AS ?estaciones_con_datos_aire)
-       (COUNT(DISTINCT ?celda) AS ?celdas)
 WHERE {
-  ?estacion a vocab:EstacionBicicleta ;
-            vocab:contenidaEnCelda ?celda .
-  ?celda a vocab:CeldaModelo ;
-         geo:lat ?lat .
-  OPTIONAL {
-    ?obs a vocab:ObservacionCalidadAire ;
-         sosa:hasFeatureOfInterest ?celda .
-    BIND(?estacion AS ?conAire)
-  }
+  ?estacion a vocab:EstacionBicicleta .
+  OPTIONAL { ?estacion schema:containedInPlace ?barrio . ?barrio a vocab:Barrio . }
+  OPTIONAL { ?estacion schema:containedInPlace ?celda . ?celda a vocab:CeldaModelo . }
+  BIND(IF(BOUND(?barrio), ?estacion, ?nada) AS ?enBarrio)
+  BIND(IF(BOUND(?celda), ?estacion, ?nada) AS ?enCelda)
+  BIND(IF(BOUND(?celda) && EXISTS { ?obs schema:observationAbout ?celda }, ?estacion, ?nada) AS ?conAire)
 }
