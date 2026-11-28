@@ -51,6 +51,7 @@ smartcity-bcn-knowledge-graph/
 │   └── procesados/              # los 11 CSV que se convierten a RDF
 ├── E3_rdf/                      # Entregable 3 (final): modelo v3, RDF, GraphDB, informe
 ├── material_curso/              # apuntes de clase y especificación de los entregables
+├── docker-compose.yml           # GraphDB listo para usar (docker compose up -d)
 └── README.md
 ```
 
@@ -107,8 +108,8 @@ uv run --no-project --with matplotlib python E3_rdf/scripts/generar_diagrama.py
 uv run --no-project --with rdflib --with pandas --with pytest python -m pytest E3_rdf/tests
 
 # 3. GraphDB (repositorio bcn-kg, un solo grafo graph/bcn-kg)
-docker run -d --name graphdb-bcn -p 7200:7200 -e GDB_HEAP_SIZE=1200m ontotext/graphdb:10.8.5
-uv run --no-project python E3_rdf/scripts/cargar_graphdb.py
+docker compose up -d                                       # GraphDB en http://localhost:7200
+uv run --no-project python E3_rdf/scripts/cargar_graphdb.py # importa y guarda las consultas (solo la 1.ª vez)
 uv run --no-project --with playwright python E3_rdf/scripts/capturar_graphdb.py   # recorrido visible
 
 # 4. Notebook e informe
@@ -116,8 +117,12 @@ uv run --no-project --with rdflib --with pandas --with matplotlib --with nbforma
 uv run --no-project --with rdflib --with pandas --with matplotlib --with python-docx python E3_rdf/scripts/generar_informe_html.py
 ```
 
-`GDB_HEAP_SIZE=1200m` es necesario: con la memoria por defecto, la consulta 07 (agrupa por distrito) falla con
-*Insufficient free Heap Memory*. La primera vez que se usa Playwright: `uv run --no-project --with playwright playwright install chromium`.
+`docker-compose.yml` deja GraphDB configurado para que siempre funcione:
+- los datos se guardan en un volumen y sobreviven a reinicios;
+- el contenedor arranca solo cuando se abre Docker;
+- tiene la memoria ajustada para que las consultas con `GROUP BY` no fallen con *Insufficient free Heap Memory*.
+
+La primera vez que se usa Playwright: `uv run --no-project --with playwright playwright install chromium`.
 
 ---
 

@@ -12,7 +12,7 @@ Capturas generadas en E3_rdf/informe/capturas/:
     graphdb_grafo_enlace.png     Visual graph de una celda CAMS: el nodo puente con el aire
     graphdb_integracion.png      Consulta 06: tabla de integración movilidad + calidad del aire
 
-Requisito: GraphDB con el repositorio cargado (cargar_graphdb.py).
+Requisito: GraphDB en marcha (docker compose up -d) con el repositorio cargado (cargar_graphdb.py).
 
 Uso:
     uv run --no-project --with playwright python E3_rdf/scripts/capturar_graphdb.py [--oculto]

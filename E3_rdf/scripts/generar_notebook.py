@@ -402,7 +402,8 @@ integracion.head(8)
     md("""
 ## 13. Almacenamiento en GraphDB
 
-GraphDB 10.8.5 se ejecuta en Docker (`docker run -d --name graphdb-bcn -p 7200:7200 ontotext/graphdb:10.8.5`).
+GraphDB 10.8.5 se ejecuta en Docker con `docker compose up -d` (archivo `docker-compose.yml` en la raíz: datos en un
+volumen persistente y memoria ajustada para las consultas con `GROUP BY`).
 El script `cargar_graphdb.py` usa la API REST de GraphDB para:
 1. crear el repositorio `bcn-kg` (ruleset RDFS-Plus Optimized);
 2. importar los cuatro archivos (vocabulario, Bicing, calidad del aire y barrios) en **un solo grafo** `graph/bcn-kg`,

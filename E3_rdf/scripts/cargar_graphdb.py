@@ -5,8 +5,8 @@ en UN solo grafo y verifica la carga con las consultas de E3_rdf/sparql/
 (verificación, integración y preguntas de competencia). Los resultados se guardan
 en E3_rdf/graphdb/ (JSON) y la tabla de integración también en CSV.
 
-Requisito: GraphDB en ejecución, por ejemplo con Docker:
-    docker run -d --name graphdb-bcn -p 7200:7200 ontotext/graphdb:10.8.5
+Requisito: GraphDB en ejecución. Desde la raíz del repositorio:
+    docker compose up -d
 
 Uso:
     uv run --no-project python E3_rdf/scripts/cargar_graphdb.py [--url http://localhost:7200]
@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -63,6 +64,20 @@ def peticion(url: str, metodo: str = "GET", datos: bytes | None = None,
     req = urllib.request.Request(url, data=datos, method=metodo, headers=cabeceras or {})
     with urllib.request.urlopen(req, timeout=120) as r:
         return r.read()
+
+
+def esperar_graphdb(base: str, segundos: int = 180) -> None:
+    """GraphDB tarda unos 30 s en arrancar: reintenta hasta que responda."""
+    limite = time.monotonic() + segundos
+    while True:
+        try:
+            peticion(f"{base}/rest/repositories")
+            return
+        except (urllib.error.URLError, ConnectionError, TimeoutError):
+            if time.monotonic() > limite:
+                raise
+            print("  esperando a GraphDB...")
+            time.sleep(5)
 
 
 def crear_repositorio(base: str) -> None:
@@ -153,9 +168,11 @@ if __name__ == "__main__":
     parser.add_argument("--url", default="http://localhost:7200")
     args = parser.parse_args()
     try:
+        esperar_graphdb(args.url)
         crear_repositorio(args.url)
         importar(args.url)
         verificar(args.url)
         guardar_consultas(args.url)
     except urllib.error.URLError as e:
-        raise SystemExit(f"No se pudo conectar con GraphDB en {args.url}: {e}")
+        raise SystemExit(f"No se pudo conectar con GraphDB en {args.url} ({e}). "
+                         "¿Está abierto Docker? Ejecutar: docker compose up -d")

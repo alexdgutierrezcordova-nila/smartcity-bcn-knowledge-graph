@@ -5,9 +5,12 @@ Workbench: http://localhost:7200 · repositorio **bcn-kg** · un solo grafo `htt
 ## Antes de empezar
 
 - Conectar la computadora a la corriente: si entra en reposo, Docker se detiene.
-- Si GraphDB no abre, ejecutar `docker start graphdb-bcn` y esperar unos 30 segundos.
-- Si el repositorio está vacío o desactualizado, ejecutar `uv run --no-project python E3_rdf/scripts/cargar_graphdb.py`.
-  Este comando importa los datos y deja guardadas todas las consultas.
+- Abrir **Docker Desktop**. GraphDB arranca solo; esperar unos 30 segundos y abrir el Workbench.
+  - Si no arranca, ejecutar `docker compose up -d` desde la raíz del repositorio.
+  - Los datos quedan guardados en un volumen: no hace falta volver a cargarlos.
+- Solo si el repositorio está vacío (primera vez en otra computadora) o se cambió el RDF, ejecutar
+  `uv run --no-project python E3_rdf/scripts/cargar_graphdb.py`. Este comando importa los datos y deja guardadas
+  todas las consultas.
 - **Recorrido automático:** `uv run --no-project --with playwright python E3_rdf/scripts/capturar_graphdb.py`.
   - Abre un navegador visible y hace solo los pasos 1 a 7 de abajo.
   - En cada paso muestra un cartel que explica lo que se ve.
@@ -83,9 +86,9 @@ Cada una tiene su archivo `E3_rdf/sparql/pcNN.rq`.
 
 ## Si algo falla
 - **"Rendering results" se queda cargando:** clic en **Results only** y luego en **Editor and results**.
-- **Error *Insufficient free Heap Memory*:** el contenedor se creó sin memoria suficiente. Recrearlo así:
+- **Error *Insufficient free Heap Memory*:** el contenedor no se creó con `docker-compose.yml`. Recrearlo así:
   ```bash
   docker rm -f graphdb-bcn
-  docker run -d --name graphdb-bcn -p 7200:7200 -e GDB_HEAP_SIZE=1200m ontotext/graphdb:10.8.5
+  docker compose up -d
   uv run --no-project python E3_rdf/scripts/cargar_graphdb.py
   ```

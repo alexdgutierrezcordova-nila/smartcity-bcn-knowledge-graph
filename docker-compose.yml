@@ -1,0 +1,22 @@
+# GraphDB para el proyecto (repositorio bcn-kg).
+#   docker compose up -d                                   → arranca GraphDB en http://localhost:7200
+#   uv run --no-project python E3_rdf/scripts/cargar_graphdb.py   → carga los datos (solo la primera vez)
+# Los datos quedan en el volumen graphdb-data: sobreviven a reinicios y a recrear el contenedor.
+services:
+  graphdb:
+    image: ontotext/graphdb:10.8.5
+    container_name: graphdb-bcn
+    ports:
+      - "7200:7200"
+    environment:
+      # GraphDB rechaza GROUP BY / DISTINCT cuando quedan menos de 250 MB libres en el heap
+      # ("Insufficient free Heap Memory"). El grafo es pequeño (~14 000 tripletas), así que
+      # se baja ese umbral a 64 MB y se da 1200 MB de heap.
+      GDB_HEAP_SIZE: 1200m
+      GDB_JAVA_OPTS: -Ddefault.min.distinct.threshold=67108864
+    volumes:
+      - graphdb-data:/opt/graphdb/home
+    restart: unless-stopped
+
+volumes:
+  graphdb-data:
