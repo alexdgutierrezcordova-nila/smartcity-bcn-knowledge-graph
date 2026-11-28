@@ -46,7 +46,7 @@ DIR_CAPTURAS = DIR_INFORME / "capturas"
 DIR_MODELO = DIR_E3 / "modelo"
 DIR_SPARQL = DIR_E3 / "sparql"
 DIR_GRAPHDB = DIR_E3 / "graphdb"
-DIR_RAW = RAIZ / "E2_extraccion" / "data" / "raw"
+DIR_RAW = RAIZ / "datos" / "crudos"
 RUTA_E1 = RAIZ / "E1_correccion" / "E1_base_corregida.md"
 HORA_H = "2026-11-12T17:00:00+00:00"
 
@@ -149,7 +149,7 @@ def construir() -> list[tuple]:
     estaciones_raw = red["stations"]
     dfs = gen.cargar_csv()
     pre = preprocesar.ejecutar(guardar=False)
-    estado, celdas, obs = dfs["citybikes_estado"], pre["celdas_cams"], pre["observaciones_cams"]
+    estado, celdas, obs = dfs["citybikes_estado"], pre["cams_celdas"], pre["cams_observaciones"]
     enlace = pre["enlace_estacion_celda"]
 
     gb, ga = gen.ejecutar(guardar=False)

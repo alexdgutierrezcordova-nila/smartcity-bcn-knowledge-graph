@@ -121,14 +121,16 @@ pd.DataFrame(sorted(filas), columns=['Propiedad', 'Dominio', 'Rango'])
     md("""
 ## 4. Revisión de los datos de entrada
 
-Se revisan los CSV limpios del Entregable 2: número de filas, duplicados por clave y valores nulos.
+Todos los datos están en `datos/procesados/` (8 CSV definitivos, descritos en `datos/README.md`).
+Aquí se revisan los de CityBikes que vienen de la limpieza del Entregable 2: filas, duplicados por clave
+y valores nulos. Los de calidad del aire (`cams_*.csv`) y el enlace se generan en la sección 5.
 """),
     code("""
 claves = {
     'citybikes_estaciones': ['id_estacion'],
     'citybikes_estado': ['id_estacion', 'captura_utc'],
     'citybikes_operadores': ['id_operador'],
-    'openmeteo_observaciones': ['id_celda', 'hora_utc', 'contaminante'],
+    'procedencia': ['archivo_raw'],
 }
 resumen = []
 for nombre, clave in claves.items():
@@ -170,10 +172,10 @@ la misma regla (contención exacta, en lugar de "celda más cercana").
     code("""
 pre = preprocesar.ejecutar(guardar=True)
 print('Celdas resultantes:')
-display(pre['celdas_cams'])
+display(pre['cams_celdas'])
 print('Estaciones por celda:')
 display(pre['enlace_estacion_celda'].groupby(['id_celda', 'celda_con_datos']).size().rename('estaciones').reset_index())
-print('Observaciones CAMS:', len(pre['observaciones_cams']), '(3 celdas × 48 horas × 3 contaminantes)')
+print('Observaciones CAMS:', len(pre['cams_observaciones']), '(3 celdas × 48 horas × 3 contaminantes)')
 """),
     md("""
 **Limitación documentada:** la celda `celda_41.45_2.25` (noreste, 42 estaciones) no fue muestreada en la

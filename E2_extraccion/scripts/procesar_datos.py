@@ -96,10 +96,8 @@ def procesar_todo(dir_raw: Path, dir_processed: Path) -> dict[str, int]:
         "citybikes_estaciones.csv": df_estaciones,
         "citybikes_estado.csv": df_estado_total,
         "citybikes_operadores.csv": df_operadores,
-        "openmeteo_celdas.csv": df_celdas_total,
-        "openmeteo_observaciones.csv": df_obs_total,
-        "enlace_estacion_celda.csv": df_enlace_esp,
-        "enlace_estado_observacion.csv": df_enlace_temp,
+        # Celdas, observaciones CAMS y enlace estación–celda los genera
+        # E3_rdf/scripts/preprocesar.py con la rejilla CAMS corregida.
         "incidencias_calidad.csv": df_incidencias,
     }
 
@@ -119,4 +117,4 @@ def procesar_todo(dir_raw: Path, dir_processed: Path) -> dict[str, int]:
 
 if __name__ == "__main__":
     dir_base = DIR_RAIZ
-    procesar_todo(dir_base / "data" / "raw", dir_base / "data" / "processed")
+    procesar_todo(dir_base.parent / "datos" / "crudos", dir_base.parent / "datos" / "procesados")

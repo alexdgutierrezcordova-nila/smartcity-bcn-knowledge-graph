@@ -65,7 +65,7 @@ def test_celda_de_usa_rejilla_cams_de_01_grados():
 
 def test_preprocesar_conserva_las_tres_series_distintas():
     r = pre.ejecutar(guardar=False)
-    no2 = r["observaciones_cams"].query("contaminante == 'NO2'")
+    no2 = r["cams_observaciones"].query("contaminante == 'NO2'")
     primeras = no2.sort_values("hora_utc").groupby("id_celda").valor.first()
     assert primeras.nunique() == 3  # E2 las había fusionado en una sola
     assert len(r["enlace_estacion_celda"]) == 542

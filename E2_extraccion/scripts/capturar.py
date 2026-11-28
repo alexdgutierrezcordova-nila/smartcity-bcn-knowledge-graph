@@ -65,7 +65,7 @@ def ejecutar_ciclo_captura(
     archivo_cb = f"citybikes_bicing_{ts_cb}Z.json"
     registrar_procedencia(
         ruta_registro_csv=procedencia_csv,
-        archivo_raw=f"data/raw/citybikes/{archivo_cb}",  # relative: no local user paths
+        archivo_raw=f"datos/crudos/citybikes/{archivo_cb}",  # relative: no local user paths
         url=sobre_cb["url"],
         extraido_utc=sobre_cb["extraido_utc"],
         http_status=sobre_cb["http_status"],
@@ -89,7 +89,7 @@ def ejecutar_ciclo_captura(
     archivo_om = f"openmeteo_cams_{ts_om}Z.json"
     registrar_procedencia(
         ruta_registro_csv=procedencia_csv,
-        archivo_raw=f"data/raw/openmeteo/{archivo_om}",  # relative: no local user paths
+        archivo_raw=f"datos/crudos/openmeteo/{archivo_om}",  # relative: no local user paths
         url=sobre_om["url"],
         extraido_utc=sobre_om["extraido_utc"],
         http_status=sobre_om["http_status"],
@@ -106,8 +106,8 @@ def main() -> None:
     parser.add_argument("--intervalo-min", type=int, default=60, help="Intervalo en minutos entre capturas (por defecto: 60)")
     parser.add_argument("--past-days", type=int, default=1, help="Días pasados a consultar en Open-Meteo (por defecto: 1)")
     parser.add_argument("--forecast-days", type=int, default=1, help="Días de pronóstico en Open-Meteo (por defecto: 1)")
-    parser.add_argument("--salida-dir", type=str, default="data/raw", help="Directorio raíz para JSON crudos")
-    parser.add_argument("--procedencia-csv", type=str, default="data/processed/procedencia.csv", help="Ruta para registro de procedencia")
+    parser.add_argument("--salida-dir", type=str, default="../datos/crudos", help="Directorio raíz para JSON crudos")
+    parser.add_argument("--procedencia-csv", type=str, default="../datos/procesados/procedencia.csv", help="Ruta para registro de procedencia")
     parser.add_argument("--una-vez", action="store_true", help="Ejecutar una sola captura y salir (modo piloto)")
 
     args = parser.parse_args()

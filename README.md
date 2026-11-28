@@ -20,55 +20,37 @@ Este repositorio contiene la arquitectura, pipeline ETL, modelo ontológico (RDF
 ## 🏗️ Estructura del Repositorio
 
 ```text
-Proyecto General/
-├── Clases/                      # Apuntes y transcripciones de las cátedras universitarias
-├── E1_correccion/               # Documento base corregido del Entregable 1 (auditoría técnica)
-│   └── E1_base_corregida.md     # Fichas técnicas, matriz de 15 PC y estrategia de enlace
-├── E2_extraccion/               # Entregable 2: Pipeline ETL, datos y modelo tentativo
-│   ├── data/
-│   │   ├── raw/                 # Capturas crudas JSON inalteradas (sobres de procedencia)
-│   │   └── processed/           # Datasets limpios e integrados (CSV)
-│   ├── modelo/                  # Especificación ontológica tentativa
-│   │   ├── vocab.ttl            # Vocabulario formal en sintaxis Turtle (RDF/OWL/SOSA)
-│   │   ├── modelo_tentativo.md  # Justificación ontológica, clases, propiedades y axiomas
-│   │   └── mapeo_campos.csv     # Matriz de correspondencia campos API ↔ términos semánticos
-│   ├── notebooks/               # Cuadernos Jupyter y reportes exportados
-│   │   ├── E2_extraccion_limpieza.ipynb # Pipeline reproducible con análisis exploratorio
-│   │   └── E2_extraccion_limpieza.html  # Reporte autocontenido para evaluación docente
-│   ├── scripts/                 # Scripts modulares de captura, procesamiento y verificación
-│   ├── src/bcn_kg/              # Paquete Python estructurado (extracción, limpieza, enlace)
-│   ├── tests/                   # Batería de pruebas unitarias automatizadas (pytest)
-│   ├── pyproject.toml           # Configuración de dependencias con uv (Python 3.12)
-│   └── run_final.ps1            # Script de orquestación y empaquetado final
-├── BIM1 - Práctica - E1.docx    # Documento original del Entregable 1
-└── .gitignore                   # Exclusión estricta de entornos virtuales y archivos temporales
+smartcity-bcn-knowledge-graph/
+├── datos/                       # ÚNICA carpeta de datos del proyecto (ver datos/README.md)
+│   ├── crudos/                  # Respuestas JSON de las APIs, sin modificar
+│   └── procesados/              # Los 8 CSV definitivos que se convierten a RDF
+├── E1_correccion/               # Entregable 1: dominio, fuentes y 15 preguntas de competencia
+├── E2_extraccion/               # Entregable 2: código de extracción y limpieza, modelo tentativo
+│   ├── src/bcn_kg/              # Funciones de extracción, limpieza y enlace
+│   ├── scripts/                 # capturar.py (APIs → datos/crudos) y procesar_datos.py (→ datos/procesados)
+│   ├── modelo/                  # Modelo tentativo del E2 (histórico)
+│   ├── notebooks/               # Notebook HTML entregado en el E2
+│   └── tests/
+├── E3_rdf/                      # Entregable 3: modelo v2, RDF, GraphDB e informe
+├── Clases/                      # Apuntes de clase
+└── README.md
 ```
 
 ---
 
 ## 🚀 Instrucciones de Reproducción
 
-### 1. Clonar el repositorio y configurar el entorno
 ```bash
 git clone https://github.com/alexdgutierrezcordova-nila/smartcity-bcn-knowledge-graph.git
 cd smartcity-bcn-knowledge-graph/E2_extraccion
 uv sync
-```
-
-### 2. Ejecutar las pruebas unitarias
-```bash
+uv run python scripts/capturar.py        # (opcional) nueva captura de las APIs → datos/crudos
+uv run python scripts/procesar_datos.py  # JSON → CSV de CityBikes en datos/procesados
 uv run pytest -v
 ```
 
-### 3. Verificar coherencia e integridad de datos
-```bash
-uv run python scripts/verificar_coherencia.py
-```
-
-### 4. Orquestación y generación del reporte HTML
-```powershell
-powershell -ExecutionPolicy Bypass -File .\run_final.ps1
-```
+Los CSV de calidad del aire y el enlace estación–celda los genera `E3_rdf/scripts/preprocesar.py`
+(ver la sección del Entregable 3).
 
 ---
 
@@ -86,13 +68,12 @@ E3_rdf/
 ├── modelo/                   # Modelo v2: vocab.ttl, modelo_datos.png/.svg,
 │                             # vocabularios_reutilizados.csv, mapeo_campos.csv
 ├── scripts/
-│   ├── preprocesar.py        # Corrige la asignación de celdas CAMS (rejilla 0.1°)
+│   ├── preprocesar.py        # Corrige las celdas CAMS y escribe cams_*.csv y enlace en datos/procesados
 │   ├── generar_rdf.py        # CSV -> RDF (Turtle) + validación contra vocab.ttl
 │   ├── generar_diagrama.py   # Dibuja el diagrama del modelo
 │   ├── cargar_graphdb.py     # Crea el repositorio bcn-kg en GraphDB, importa y ejecuta las consultas
 │   ├── generar_notebook.py   # Construye, ejecuta y exporta el notebook técnico a HTML
 │   └── generar_informe_html.py # Informe sin código (HTML + Word)
-├── data/                     # Celdas, observaciones y enlace CAMS corregidos (CSV)
 ├── rdf/                      # bicing.ttl, calidad_aire.ttl, estadisticas.md
 ├── sparql/                   # pc01–pc15.rq (preguntas de competencia) y consultas de verificación
 ├── graphdb/                  # Resultados de las consultas ejecutadas en GraphDB

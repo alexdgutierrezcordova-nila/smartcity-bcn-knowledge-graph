@@ -40,8 +40,8 @@ def test_pc06_no2_de_la_celda_de_plaza_cataluna(grafo):
 
 def test_pc11_integra_ambas_fuentes_igual_que_pandas(grafo):
     estado = pd.read_csv(m.DIR_PROCESADOS / "citybikes_estado.csv")
-    enlace = pd.read_csv(RAIZ_E3 / "data" / "enlace_estacion_celda.csv")
-    obs = pd.read_csv(RAIZ_E3 / "data" / "observaciones_cams.csv")
+    enlace = pd.read_csv(m.DIR_PROCESADOS / "enlace_estacion_celda.csv")
+    obs = pd.read_csv(m.DIR_PROCESADOS / "cams_observaciones.csv")
     no2 = obs[(obs.contaminante == "NO2") & (obs.hora_utc == HORA_H)][["id_celda", "valor"]]
     esperado = estado[estado.free_bikes >= 5].merge(enlace, on="id_estacion").merge(no2, on="id_celda")
     assert len(consultar(grafo, "pc11")) == (esperado.valor <= 25).sum() > 0
@@ -49,5 +49,5 @@ def test_pc11_integra_ambas_fuentes_igual_que_pandas(grafo):
 
 def test_pc14_celda_con_mas_no2_y_sus_estaciones(grafo):
     (fila,) = consultar(grafo, "pc14")
-    enlace = pd.read_csv(RAIZ_E3 / "data" / "enlace_estacion_celda.csv")
+    enlace = pd.read_csv(m.DIR_PROCESADOS / "enlace_estacion_celda.csv")
     assert int(fila.estaciones) == (enlace.id_celda == str(fila.celda)).sum()

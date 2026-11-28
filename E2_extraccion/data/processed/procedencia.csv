@@ -1,3 +1,0 @@
-archivo_raw,url,extraido_utc,http_status,n_registros
-"data/raw/citybikes/citybikes_bicing_20261112T163053Z.json","https://api.citybik.es/v2/networks/bicing","2026-11-12T16:30:53.950242+00:00",200,542
-"data/raw/openmeteo/openmeteo_cams_20261112T163054Z.json","https://air-quality-api.open-meteo.com/v1/air-quality?latitude=41.38650%2C41.40550%2C41.37500%2C41.42600%2C41.39800%2C41.38000&longitude=2.16940%2C2.16230%2C2.14000%2C2.18500%2C2.20300%2C2.19000&hourly=nitrogen_dioxide%2Cpm10%2Cpm2_5&timezone=GMT&cell_selection=nearest&past_days=1&forecast_days=1","2026-11-12T16:30:54.720986+00:00",200,288

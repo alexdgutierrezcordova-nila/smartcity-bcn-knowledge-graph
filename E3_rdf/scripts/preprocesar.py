@@ -14,7 +14,7 @@ estaciones se asignan a su celda por la misma regla (contención exacta).
 La función verifica que todos los puntos de una misma celda traigan series
 idénticas; si no, falla (la hipótesis de rejilla sería incorrecta).
 
-Salidas en E3_rdf/data/: celdas_cams.csv, observaciones_cams.csv,
+Salidas en datos/procesados/: cams_celdas.csv, cams_observaciones.csv,
 enlace_estacion_celda.csv
 """
 
@@ -28,9 +28,9 @@ from urllib.parse import parse_qs, urlparse
 import pandas as pd
 
 RAIZ = Path(__file__).resolve().parents[2]
-DIR_RAW_CAMS = RAIZ / "E2_extraccion" / "data" / "raw" / "openmeteo"
-DIR_PROCESADOS = RAIZ / "E2_extraccion" / "data" / "processed"
-DIR_SALIDA = RAIZ / "E3_rdf" / "data"
+DIR_RAW_CAMS = RAIZ / "datos" / "crudos" / "openmeteo"
+DIR_PROCESADOS = RAIZ / "datos" / "procesados"
+DIR_SALIDA = DIR_PROCESADOS
 
 TAMANO_CELDA = 0.1
 CONTAMINANTES = {"nitrogen_dioxide": "NO2", "pm10": "PM10", "pm2_5": "PM2_5"}
@@ -127,7 +127,7 @@ def ejecutar(guardar: bool = True) -> dict[str, pd.DataFrame]:
         ["id_celda", "hora_utc", "contaminante"], keep="last").dropna(subset=["valor"])
     estaciones = pd.read_csv(DIR_PROCESADOS / "citybikes_estaciones.csv")
     enlace, celdas = enlazar_estaciones(estaciones, celdas)
-    salida = {"celdas_cams": celdas, "observaciones_cams": obs.reset_index(drop=True),
+    salida = {"cams_celdas": celdas, "cams_observaciones": obs.reset_index(drop=True),
               "enlace_estacion_celda": enlace}
     if guardar:
         DIR_SALIDA.mkdir(parents=True, exist_ok=True)
@@ -138,6 +138,6 @@ def ejecutar(guardar: bool = True) -> dict[str, pd.DataFrame]:
 
 if __name__ == "__main__":
     r = ejecutar()
-    print(r["celdas_cams"].to_string(index=False))
+    print(r["cams_celdas"].to_string(index=False))
     print(r["enlace_estacion_celda"].id_celda.value_counts().to_string())
-    print(f"observaciones: {len(r['observaciones_cams'])}")
+    print(f"observaciones: {len(r['cams_observaciones'])}")

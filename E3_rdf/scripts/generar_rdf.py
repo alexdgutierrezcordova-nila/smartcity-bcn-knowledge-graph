@@ -29,7 +29,7 @@ import preprocesar
 # Rutas y espacios de nombres
 # ---------------------------------------------------------------------------
 RAIZ = Path(__file__).resolve().parents[2]
-DIR_PROCESADOS = RAIZ / "E2_extraccion" / "data" / "processed"
+DIR_PROCESADOS = RAIZ / "datos" / "procesados"
 RUTA_VOCAB = RAIZ / "E3_rdf" / "modelo" / "vocab.ttl"
 DIR_SALIDA = RAIZ / "E3_rdf" / "rdf"
 
@@ -124,13 +124,13 @@ def fecha_hora(valor: str) -> Literal:
 
 
 def cargar_csv(limite: int = 0) -> dict[str, pd.DataFrame]:
-    """Lee los CSV procesados en E2 y el preprocesamiento CAMS de E3. Con `limite` toma solo N filas (prueba)."""
+    """Lee los CSV de datos/procesados (CityBikes) y el preprocesamiento CAMS. Con `limite` toma solo N filas (prueba)."""
     nombres = ["citybikes_estaciones", "citybikes_estado", "citybikes_operadores", "procedencia"]
     dfs = {n: pd.read_csv(DIR_PROCESADOS / f"{n}.csv") for n in nombres}
     # Celdas, observaciones y enlace vienen del preprocesamiento E3 (rejilla CAMS corregida)
     pre = preprocesar.ejecutar(guardar=False)
-    dfs["openmeteo_celdas"] = pre["celdas_cams"]
-    dfs["openmeteo_observaciones"] = pre["observaciones_cams"]
+    dfs["openmeteo_celdas"] = pre["cams_celdas"]
+    dfs["openmeteo_observaciones"] = pre["cams_observaciones"]
     dfs["enlace_estacion_celda"] = pre["enlace_estacion_celda"]
     if limite:
         dfs["citybikes_estaciones"] = dfs["citybikes_estaciones"].head(limite)
