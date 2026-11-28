@@ -1,10 +1,10 @@
 # Integración movilidad + calidad del aire: una fila por estación (tabla de evidencia)
-# Integración movilidad + calidad del aire: UNA fila por estación de Bicing con su barrio, distrito,
+# Cada fila: estación de Bicing, su barrio y distrito,
 # su estado (bicicletas y anclajes) y el aire de su celda CAMS a la hora H = 12/11/2026 17:00 UTC
 # (hora más cercana a la captura de Bicing, 16:30 UTC).
 # Recorre las tres fuentes en una sola consulta: CityBikes + Open Data BCN + CAMS.
 # Resultado esperado: 542 filas; 500 con datos de aire (las 42 de la celda 41.45, 2.25 no tienen punto CAMS).
-# Se exporta a E3_rdf/graphdb/integracion_movilidad_aire.csv (tabla de evidencia).
+# Se exporta a E3_rdf/graphdb/integracion_movilidad_aire.csv.
 PREFIX schema: <https://schema.org/>
 PREFIX sosa: <http://www.w3.org/ns/sosa/>
 PREFIX vocab: <http://example.org/bcn-kg/vocab#>

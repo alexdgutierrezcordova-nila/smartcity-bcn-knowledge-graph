@@ -1,5 +1,4 @@
 # Grafo visual: una estación con todas sus conexiones (abrir en Visual graph)
-# Grafo visual de UNA estación con todas sus conexiones (abrir el resultado en "Visual graph").
 # Movilidad:   Estado (schema:Observation) → Estación → Red Bicing → Operadores
 # Territorio:  Estación → Barrio → Distrito → Barcelona          (schema:containedInPlace)
 # Aire:        Estación → Celda CAMS ← Mediciones de NO2/PM10/PM2.5 a la hora H (schema:observationAbout)

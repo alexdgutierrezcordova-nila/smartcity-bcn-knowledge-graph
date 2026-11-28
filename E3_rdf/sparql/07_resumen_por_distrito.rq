@@ -1,6 +1,5 @@
 # Resumen por distrito: estaciones, bicicletas y NO2 medio a la hora H
-# Resumen por distrito: cuántas estaciones y bicicletas hay en cada distrito y qué NO2 medio
-# respiran sus estaciones a la hora H (12/11/2026 17:00 UTC).
+# H = 12/11/2026 17:00 UTC (hora CAMS más cercana a la captura de Bicing).
 # Sube por la jerarquía Estación → Barrio → Distrito y cruza con la celda CAMS de cada estación.
 PREFIX schema: <https://schema.org/>
 PREFIX sosa: <http://www.w3.org/ns/sosa/>

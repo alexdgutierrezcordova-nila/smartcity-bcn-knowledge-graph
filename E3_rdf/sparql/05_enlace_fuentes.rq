@@ -1,6 +1,5 @@
 # Enlace de las tres fuentes: estaciones en barrio, en celda CAMS y con datos de aire
-# Enlace entre las tres fuentes: ¿cuántas estaciones de Bicing (Fuente 1) quedan conectadas
-# con un barrio (Fuente 3) y con una celda CAMS (Fuente 2)? Lo hacen porque usan las MISMAS URIs.
+# Las estaciones (Fuente 1) se conectan con su barrio (Fuente 3) y su celda CAMS (Fuente 2) porque usan las MISMAS URIs.
 #   estaciones_en_barrio      esperado 542 (todas caen dentro del contorno de un barrio)
 #   estaciones_en_celda       esperado 542
 #   estaciones_con_datos_aire esperado 500 (las 42 de la celda 41.45, 2.25 no tienen punto CAMS consultado)
